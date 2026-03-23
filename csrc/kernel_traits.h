@@ -9,6 +9,8 @@
 
 using namespace cute;
 
+// 两个kernel traits，
+
 template<int kHeadDim_, int kBlockM_, int kBlockN_, int kNWarps_, typename elem_type=cutlass::half_t>
 struct Pat_kernel_traits {
 

@@ -1,5 +1,7 @@
 #pragma once
 
+// CTA块信息定义
+
 #include "namespace_config.h"
 #include "cute/tensor.hpp"
 #include "cutlass/cutlass.h"
@@ -15,6 +17,7 @@ template <int HRatio>
 struct Block {
 
     // The bidh is bidh * HRatio
+    // bidb是block自身的索引， bidh是所处理kv头的索引
     template<typename Params>
     __device__ Block(const Params &params, const int bidb)
         : sum_s_q(reinterpret_cast<int*>(params.num_seqs_per_CTA_ptr)[bidb] * HRatio)
@@ -22,7 +25,7 @@ struct Block {
     {}
 
     __forceinline__ __device__ int q_offset(const int bidh, const int head_stride) const {
-        return bidh * HRatio * head_stride;
+        return bidh * HRatio * head_stride; // q相对地址，不是索引，故头* 每个头负责几个q * 相邻q头之间的步长
     }
 
     template<typename Params>

@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <iostream>
 
+// 前缀树类定义
+
 struct KernelInfo {
     std::vector<torch::Tensor> q_tables;
     std::vector<torch::Tensor> block_tables;
@@ -183,7 +185,7 @@ public:
     void pack_schedule(std::optional<std::vector<std::vector<int>>> MNWs,
                        int HRatio = 1,
                        int kvHead = 8,
-                       bool use_compute_model = false) {
+                       bool use_sota = false) {
 
         std::vector<std::vector<int>> buckets;
         if (!MNWs.has_value() || MNWs->empty()) {
@@ -216,7 +218,11 @@ public:
         }
 
         // Balance Pack
-        packed_boxes = balancePack(packed_boxes, kvHead, HRatio);
+        if (use_sota) {
+            packed_boxes = balancePackSota(packed_boxes, kvHead, HRatio);
+        } else {
+            packed_boxes = balancePack(packed_boxes, kvHead, HRatio);
+        }
 
         std::map<std::vector<int>, std::vector<PackedBox>> grouped;
         for (const auto& b : buckets) {
@@ -322,6 +328,13 @@ public:
             if(v > _internal_info.max_split_per_seq) _internal_info.max_split_per_seq = v;
         }
     }
+
+    void pack_schedule_sota(std::optional<std::vector<std::vector<int>>> MNWs,
+                             int HRatio = 1,
+                             int kvHead = 8) {
+        pack_schedule(MNWs, HRatio, kvHead, true);
+    }
+
 private:
     inline int ceil_div(int a, int b) {
         return (a + b - 1) / b;
@@ -620,4 +633,32 @@ private:
         return cropPack;
     }
 
+    std::vector<PackedBox> balancePackSota(const std::vector<PackedBox>& boxes, int kvHead, int HRatio = 1) {
+        // 示例：改进的负载均衡逻辑
+        // 1. 计算总块数和平均值（类似原函数）
+        int total_blocks = 0;
+        for (const auto& box : boxes) {
+            total_blocks += box.block_table_ptr->size();
+        }
+        double avg_blocks = static_cast<double>(total_blocks) / boxes.size();
+
+        // 2. 改进阈值计算（例如，更动态的阈值）
+        double threshold = avg_blocks * 1.2;  // 示例：比原函数更保守的阈值
+
+        // 3. 分组逻辑（简化示例，实际需实现完整算法）
+        std::vector<PackedBox> cropPack;
+        for (const auto& box : boxes) {
+            if (box.block_table_ptr->size() > threshold) {
+                // 拆分逻辑（需实现）
+                // ...
+            } else {
+                cropPack.push_back(box);
+            }
+        }
+
+        // 更新 split_per_seq 等状态
+        // ...
+
+        return cropPack;
+    }
 };

@@ -33,8 +33,10 @@ HEAD_CONFIGS=(
 )
 
 OUTPUT_FILE="kernel_perf.json"
+SCHEDULE_OUTPUT_FILE="schedule_perf.json"
 
 rm -f $OUTPUT_FILE
+rm -f $SCHEDULE_OUTPUT_FILE
 
 # --- progress bar helpers ---
 progress_bar () {
@@ -70,7 +72,10 @@ for tree in "${TREES[@]}"; do
 
     rm -rf ~/.cache/flashinfer
     read -r hq hkv <<< "$config"
-    python benchmark_kernel.py --tree "$tree" --nheads_q "$hq" --nheads_kv "$hkv" --output_file "$OUTPUT_FILE" > kernel.log 2>&1
+    # python benchmark_kernel.py --tree "$tree" --nheads_q "$hq" --nheads_kv "$hkv" --output_file "$OUTPUT_FILE" > kernel.log 2>&1
+
+    # Run schedule test for this tree and config
+    python ./schedule_test.py --tree "$tree" --nheads_q "$hq" --nheads_kv "$hkv" --block_size 32 --output_file "$SCHEDULE_OUTPUT_FILE" >> schedule.log 2>&1
   done
 done
 

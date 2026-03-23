@@ -3,7 +3,8 @@
 NUM_PROMPTS=5000
 ALL_REQ_RATES=($(seq 7 2 9))
 
-MODELS=("meta-llama/Meta-Llama-3-8B" "Qwen/Qwen3-8B")
+# MODELS=("meta-llama/Meta-Llama-3-8B" "Qwen/Qwen3-8B")
+MODELS=("/root/share/models/Llama-3.2-1B-Instruct" "/root/share/models/Qwen2.5-1.5B-Instruct")
 TRACES=("toolagent" "burst")
 BACKENDS=("FLASH_ATTN" "FLASHINFER" "PREFIX_ATTN" "Relay_ATTN")
 
@@ -28,17 +29,23 @@ run_worker() {
     for rate in "${MY_RATES[@]}"; do
         for model in "${MODELS[@]}"; do
 
-            if [[ "$model" == "meta-llama/Meta-Llama-3-8B" ]]; then
+            # if [[ "$model" == "meta-llama/Meta-Llama-3-8B" ]]; then
+            #     MAX_MODEL_LEN=8192
+            # elif [[ "$model" == "Qwen/Qwen3-8B" ]]; then
+            #     MAX_MODEL_LEN=32768
+            # fi
+
+            if [[ "$model" == "/root/share/models/Llama-3.2-1B-Instruct" ]]; then
                 MAX_MODEL_LEN=8192
-            elif [[ "$model" == "Qwen/Qwen3-8B" ]]; then
-                MAX_MODEL_LEN=32768
+            elif [[ "$model" == "/root/share/models/Qwen2.5-1.5B-Instruct" ]]; then
+                MAX_MODEL_LEN=8192 # * 4
             fi
 
             for trace in "${TRACES[@]}"; do
                 for backend in "${BACKENDS[@]}"; do
 
                     if [[ "$trace" == "toolagent" ]]; then
-                        BLOCK_SIZE=512
+                        BLOCK_SIZE=64 # * 4
                     elif [[ "$trace" == "burst" ]]; then
                         BLOCK_SIZE=16
                     fi
@@ -53,6 +60,15 @@ run_worker() {
                         echo "[GPU $MY_GPU_ID] [SKIP] $CURRENT_TASK_ID"
                         continue
                     fi
+
+                                    # ---------- 新增：释放端口 ----------
+                    echo "[GPU $MY_GPU_ID] Releasing port $MY_PORT..."
+                    # 使用 lsof 查找并杀掉占用端口的进程
+                    if command -v lsof >/dev/null 2>&1; then
+                        lsof -ti:$MY_PORT | xargs -r kill -9 2>/dev/null || true
+                    fi
+                    sleep 10   # 等待端口完全释放
+                    # ------------------------------------
 
                     echo "[GPU $MY_GPU_ID] Running: $CURRENT_TASK_ID"
 

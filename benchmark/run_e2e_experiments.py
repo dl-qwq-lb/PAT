@@ -148,6 +148,11 @@ def run_experiment(config, OUTPUT_LOG_FILE):
             config["request_rate"],
             "--dataset-type",
             config["trace"],
+            
+            # debug parameters
+            "--model",
+            # config["model"], # 单条命令指定模型、指定服务器
+            "LLM", # script fitted
             # Add any additional benchmark-specific arguments below.
         ]
         if config["trace"] == "burst":

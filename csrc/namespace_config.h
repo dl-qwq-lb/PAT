@@ -1,6 +1,8 @@
 /******************************************************************************
  * Copyright (c) 2023, Tri Dao.
  ******************************************************************************/
+
+ // namespace 设置
 /**
 * @file flash_namespace_config.h
  * @brief Configuration file for Flash namespace management and isolation
