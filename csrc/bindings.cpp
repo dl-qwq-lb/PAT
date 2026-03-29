@@ -146,37 +146,41 @@ PYBIND11_MODULE(_prefix_attn, m) {
         }, py::arg("seq_lens"), py::arg("block_table"))
 
         .def("pack_schedule", [](PrefixTree& tree,
-                             py::object MNWs_obj,  // optional
-                             int HRatio,
-                             int kvHead,
-                             bool use_sota)
+                     py::object MNWs_obj,  // optional
+                     int HRatio,
+                     int kvHead,
+                     bool use_sota,
+                     int max_cta)
         {
             std::vector<std::vector<int>> MNWs_vec;
             if (!MNWs_obj.is_none()) {
                 MNWs_vec = MNWs_obj.cast<std::vector<std::vector<int>>>();
             }
             py::gil_scoped_release release;  // release GIL during packing
-            tree.pack_schedule(MNWs_vec, HRatio, kvHead, use_sota);
+            tree.pack_schedule(MNWs_vec, HRatio, kvHead, use_sota, max_cta);
         }, py::arg("MNWs") = py::none(), 
            py::arg("HRatio") = 1,
            py::arg("kvHead") = 8,
-           py::arg("use_sota") = false
+           py::arg("use_sota") = false,
+           py::arg("max_cta") = -1
         )
 
         .def("pack_schedule_sota", [](PrefixTree& tree,
                              py::object MNWs_obj,
                              int HRatio,
-                             int kvHead)
+                             int kvHead,
+                             int max_cta)
         {
             std::vector<std::vector<int>> MNWs_vec;
             if (!MNWs_obj.is_none()) {
                 MNWs_vec = MNWs_obj.cast<std::vector<std::vector<int>>>();
             }
             py::gil_scoped_release release;
-            tree.pack_schedule_sota(MNWs_vec, HRatio, kvHead);
+            tree.pack_schedule_sota(MNWs_vec, HRatio, kvHead, max_cta);
         }, py::arg("MNWs") = py::none(),
            py::arg("HRatio") = 1,
-           py::arg("kvHead") = 8
+           py::arg("kvHead") = 8,
+           py::arg("max_cta") = -1
         )
 
         .def_readonly("kernel_info", &PrefixTree::_internal_info, py::return_value_policy::reference_internal);

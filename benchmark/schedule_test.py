@@ -16,7 +16,14 @@ from prefix_attn import PrefixTreeCPP
   
   
 # utils part══════════════════════════════════════════════════════════════════════   
-  
+def get_sm_count(device=0):
+    """返回指定 GPU 设备的 SM 数量"""
+    if torch.cuda.is_available():
+        props = torch.cuda.get_device_properties(device)
+        return props.multi_processor_count
+    else:
+        return None
+      
 def pad_block_table(block_table: List[List[int]],  
                     padding_value: int = 0,  
                     dtype=torch.int32) -> torch.Tensor:  
@@ -61,12 +68,13 @@ def run_cpp_schedule_sota(seq_lens: List[int],
                           block_size: int,
                           HRatio: int = 1,
                           kvHead: int = 8,
-                          MNWs=None):
+                          MNWs=None,
+                          max_cta: int = -1):
 
     padded_tensor = pad_block_table(block_table)          # CPU int32 Tensor
     tree = PrefixTreeCPP(block_size)
     tree.build_radix_tree(seq_lens, padded_tensor)        # 建基数树
-    tree.pack_schedule_sota(MNWs, HRatio, kvHead)         # 使用 SOTA 调度链路
+    tree.pack_schedule_sota(MNWs, HRatio, kvHead, max_cta)  # 使用 SOTA 调度链路
     return tree, tree.kernel_info
 
 def print_cpp_kernel_info(ki, label: str = "C++ kernel_info"):  
@@ -135,9 +143,6 @@ def compare_schedules(ki_cpp, ki_sota: KernelInfo, label: str = "") -> bool:
             print(f"         C++ = {cpp_nsps}")  
             print(f"         sota  = {sota_nsps}")  
             all_pass = False
-            print(f"         C++ = {cpp_nsps}")  
-            print(f"         sota  = {sota_nsps}")  
-            all_pass = False  
   
         # 2. MNWs nums 
         n_cpp = len(ki_cpp.MNWs)  
@@ -168,15 +173,15 @@ def compare_schedules(ki_cpp, ki_sota: KernelInfo, label: str = "") -> bool:
             status = "✅ PASS" if bucket_ok else "❌ DIFF"  
             print(f"\n  {status}  Bucket[{k}] MNW C++={mnw_cpp} / sota={mnw_sota}")  
   
-            if not kv_ok:  
-                print(f"         kv_in_CTAs  C++={cpp_kv}")  
-                print(f"                     sota ={sota_kv}")  
-            if not rk_ok:  
-                print(f"         CTA_ranks   C++={cpp_rk}")  
-                print(f"                     sota ={sota_rk}")  
-            if not ns_ok:  
-                print(f"         num_seqs    C++={cpp_ns}")  
-                print(f"                     sota ={sota_ns}")  
+            # if not kv_ok:  
+            #     print(f"         kv_in_CTAs  C++={cpp_kv}")  
+            #     print(f"                     sota ={sota_kv}")  
+            # if not rk_ok:  
+            #     print(f"         CTA_ranks   C++={cpp_rk}")  
+            #     print(f"                     sota ={sota_rk}")  
+            # if not ns_ok:  
+            #     print(f"         num_seqs    C++={cpp_ns}")  
+            #     print(f"                     sota ={sota_ns}")  
   
             all_pass &= bucket_ok  
   
@@ -211,13 +216,17 @@ def run_single_test_cpp_compare(name: str,
 
     time_base = measure_performance(run_baseline)
     ki_base = run_baseline()
+    
+    sm = get_sm_count()
+    if sm:
+        max_cta = sm * 4 
 
     # 测量 SOTA 性能
     def run_sota():
         tree = PrefixTreeCPP(block_size)
         padded_tensor = pad_block_table(block_table)
         tree.build_radix_tree(seq_lens, padded_tensor)
-        tree.pack_schedule_sota(MNWs, HRatio, kvHead)
+        tree.pack_schedule_sota(MNWs, HRatio, kvHead, max_cta)
         return tree.kernel_info
 
     time_sota = measure_performance(run_sota)

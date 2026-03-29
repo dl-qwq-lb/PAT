@@ -15,6 +15,7 @@ from prefix_attn import (
     SeqGroup,
     generate_random_kv_cache,
     PrefixTree,
+    PrefixTreeCPP,
     prefix_attn_with_kvcache,
     generate_tree_seqs,
 )
@@ -27,6 +28,13 @@ from FastTree import (
     qkv_preparation,
 )
 
+def get_sm_count(device=0):
+    """返回指定 GPU 设备的 SM 数量"""
+    if torch.cuda.is_available():
+        props = torch.cuda.get_device_properties(device)
+        return props.multi_processor_count
+    else:
+        return None
 
 def Timer(func, iter):
     import numpy as np
@@ -232,51 +240,67 @@ def benchmark(
         results["ra"] = out_ra.unsqueeze(1)  # Shape: (batch, 1, n_q, h_dim)
 
     if "pat" in run_baselines:
-        tree = PrefixTree(block_size)
-        tree.build_radix_tree(seq_group.seqlens, block_table.cpu().tolist())
-        kernel_info: KernelInfo = tree.pack_schedule(
-            MNWs=None,
-            HRatio=nheads_q // nheads_kv,
-            kvHead=nheads_kv,
-            use_compute_model=False,
-        )
-        kernel_info.to_tensor(device=device)
+        # 在同一次 benchmark 调用中，先跑 baseline 调度再跑 SOTA 调度，统一输入与环境，方便直接对比。
+        MNWs = None
+        table = block_table.cpu()
+        seq_lens = seq_group.seqlens
 
-        out_pat = torch.empty_like(q)
+        # 1) baseline 调度：use_sota = False，max_cta 设为 -1（不做额外 CTA 上限约束）
+        tree_base = PrefixTreeCPP(block_size)
+        tree_base.build_radix_tree(seq_lens, table)
+        tree_base.pack_schedule(MNWs, nheads_q // nheads_kv, nheads_kv, False, -1)
+        tree_base.kernel_info.to_gpu(torch.device(device))
 
-        def pat_func():
+        out_pat_base = torch.empty_like(q, device=device, dtype=dtype)
+
+        def pat_baseline_func():
             prefix_attn_with_kvcache(
-                q,
-                k_cache_paged,
-                v_cache_paged,
-                kernel_info.num_split_per_seq,
-                kernel_info.q_tables,
-                kernel_info.block_tables,
-                kernel_info.num_seqs_per_CTAs,
-                kernel_info.CTA_ranks,
-                kernel_info.kv_in_CTAs,
-                kernel_info.MNWs,
-                kernel_info.max_split_per_seq,
-                kernel_info.max_seqs_in_CTA,
-                kernel_info.max_blocks_in_CTA,
-                scale,
-                out_pat,
-                None,
+                q=q,
+                k_cache_paged=k_cache_paged,
+                v_cache_paged=v_cache_paged,
+                tree=tree_base,
+                softmax_scale=scale,
+                out=out_pat_base,
             )
 
-        latencies["pat"] = Timer(pat_func, n_repeats)
-        pat_func()
-        results["pat"] = out_pat
+        latencies["pat_baseline"] = Timer(pat_baseline_func, n_repeats)
+        pat_baseline_func()
+        results["pat_baseline"] = out_pat_base
 
-    if "vllm-fa" in baselines:
-        for method in ["pat", "ra++", "ra", "flashinfer"]:
-            if method in baselines:
-                correctness_report[method] = _compare_and_report(
-                    baseline_name=method,
-                    baseline_output=results[method],
-                    ref_output=results["vllm-fa"],
-                    max_error=max_error,
-                )
+        # 2) SOTA 调度：use_sota = True，使用 SM 数量 × 系数 作为 CTA 上限
+        tree_sota = PrefixTreeCPP(block_size)
+        tree_sota.build_radix_tree(seq_lens, table)
+        max_cta = get_sm_count(device) * 4 if get_sm_count(device) is not None else -1
+        tree_sota.pack_schedule(MNWs, nheads_q // nheads_kv, nheads_kv, True, max_cta)
+        tree_sota.kernel_info.to_gpu(torch.device(device))
+
+        out_pat_sota = torch.empty_like(q, device=device, dtype=dtype)
+
+        def pat_sota_func():
+            prefix_attn_with_kvcache(
+                q=q,
+                k_cache_paged=k_cache_paged,
+                v_cache_paged=v_cache_paged,
+                tree=tree_sota,
+                softmax_scale=scale,
+                out=out_pat_sota,
+            )
+
+        latencies["pat_sota"] = Timer(pat_sota_func, n_repeats)
+        pat_sota_func()
+        results["pat_sota"] = out_pat_sota
+
+    if "vllm-fa" in baselines and "vllm-fa" in results:
+        # 对所有已计算结果（除 vllm-fa 自身）做 correctness 对比，包括 pat_baseline 与 pat_sota
+        for method, out in results.items():
+            if method == "vllm-fa":
+                continue
+            correctness_report[method] = _compare_and_report(
+                baseline_name=method,
+                baseline_output=out,
+                ref_output=results["vllm-fa"],
+                max_error=max_error,
+            )
 
     return latencies, correctness_report
 
@@ -620,12 +644,100 @@ def DeFT_benchmark(
 
     return latencies, correctness_report
 
+# 原有版本，这里做了增强，增加了异常捕获和日志记录功能，以便在benchmark过程中即使出现错误也能得到有用的反馈，并且不会中断整个测试流程。
+# def run_benchmark(
+#     tree: str,
+#     nheads_q: int,
+#     nheads_kv: int,
+#     output_path: str,
+#     head_dim: int = 128,
+#     block_size: int = 32,
+#     n_repeats: int = 20,
+#     dtype: torch.dtype = torch.float16,
+#     device: str = "cuda:0",
+#     seed: int = 0,
+# ):
+#     seq_group, num_blocks = generate_tree_seqs(tree, block_size)
+#     baseline = [
+#         "vllm-fa",
+#         "pat",
+#         "flashinfer",
+#     ]
+#     if int(tree[0]) == 1 and tree[1] == ",":
+#         baseline.extend(["ra", "ra++", "cascade", "deft"])
+
+#     lats_std, corr_std = benchmark(
+#         seq_group,
+#         num_blocks,
+#         nheads_q,
+#         nheads_kv,
+#         head_dim,
+#         block_size,
+#         n_repeats,
+#         dtype,
+#         device,
+#         seed,
+#         baselines=baseline,
+#     )
+
+#     lats_ft, corr_ft = {}, {}
+#     if nheads_q // nheads_kv in [1, 4, 16]:
+#         lats_ft, corr_ft = ft_benchmark(
+#             tree,
+#             nheads_q,
+#             nheads_kv,
+#             head_dim,
+#             n_repeats,
+#             dtype,
+#             device,
+#             baselines=["fa"],
+#         )
+
+#     lats_deft, corr_deft = {}, {}
+#     lats_cascade, corr_cascade = {}, {}
+
+#     if int(tree[0]) == 1 and tree[1] == ",":
+#         lats_deft, corr_deft = DeFT_benchmark(
+#             tree, nheads_q, nheads_kv, head_dim, n_repeats, dtype, device
+#         )
+#         lats_cascade, corr_cascade = cascade_benchmark(
+#             tree, nheads_q, nheads_kv, head_dim, n_repeats, dtype, device
+#         )
+
+#     result_entry = {
+#         "tree": tree,
+#         "nheads_q": nheads_q,
+#         "nheads_kv": nheads_kv,
+#         "head_dim": head_dim,
+#         "block_size": block_size,
+#         "latencies": {**lats_std, **lats_ft, **lats_deft, **lats_cascade},
+#         "correctness": {**corr_std, **corr_ft, **corr_deft, **corr_cascade},
+#     }
+#     # print(result_entry)
+
+#     data = []
+#     if os.path.exists(output_path):
+#         try:
+#             with open(output_path, "r") as f:
+#                 content = f.read()
+#                 if content.strip():
+#                     data = json.loads(content)
+#         except:
+#             data = []
+
+#     data.append(result_entry)
+
+#     with open(output_path, "w") as f:
+#         json.dump(data, f, indent=4)
+
+#     print(f"Done: {tree} | {nheads_q}/{nheads_kv}")
 
 def run_benchmark(
     tree: str,
     nheads_q: int,
     nheads_kv: int,
     output_path: str,
+    # pat_schedule: str = "baseline", # balance debug
     head_dim: int = 128,
     block_size: int = 32,
     n_repeats: int = 20,
@@ -633,81 +745,127 @@ def run_benchmark(
     device: str = "cuda:0",
     seed: int = 0,
 ):
-    seq_group, num_blocks = generate_tree_seqs(tree, block_size)
-    baseline = [
-        "vllm-fa",
-        "pat",
-        "flashinfer",
-    ]
-    if int(tree[0]) == 1 and tree[1] == ",":
-        baseline.extend(["ra", "ra++", "cascade", "deft"])
-
-    lats_std, corr_std = benchmark(
-        seq_group,
-        num_blocks,
-        nheads_q,
-        nheads_kv,
-        head_dim,
-        block_size,
-        n_repeats,
-        dtype,
-        device,
-        seed,
-        baselines=baseline,
-    )
-
-    lats_ft, corr_ft = {}, {}
-    if nheads_q // nheads_kv in [1, 4, 16]:
-        lats_ft, corr_ft = ft_benchmark(
-            tree,
-            nheads_q,
-            nheads_kv,
-            head_dim,
-            n_repeats,
-            dtype,
-            device,
-            baselines=["fa"],
-        )
-
-    lats_deft, corr_deft = {}, {}
-    lats_cascade, corr_cascade = {}, {}
-
-    if int(tree[0]) == 1 and tree[1] == ",":
-        lats_deft, corr_deft = DeFT_benchmark(
-            tree, nheads_q, nheads_kv, head_dim, n_repeats, dtype, device
-        )
-        lats_cascade, corr_cascade = cascade_benchmark(
-            tree, nheads_q, nheads_kv, head_dim, n_repeats, dtype, device
-        )
-
+    import traceback
+    import pdb
+    
+    # 初始化结果字典，确保异常时也能写入基本信息
     result_entry = {
         "tree": tree,
         "nheads_q": nheads_q,
         "nheads_kv": nheads_kv,
         "head_dim": head_dim,
         "block_size": block_size,
-        "latencies": {**lats_std, **lats_ft, **lats_deft, **lats_cascade},
-        "correctness": {**corr_std, **corr_ft, **corr_deft, **corr_cascade},
+        "latencies": {},
+        "correctness": {},
+        "status": "failed",
+        "error": None,
     }
-    # print(result_entry)
-
-    data = []
-    if os.path.exists(output_path):
-        try:
-            with open(output_path, "r") as f:
-                content = f.read()
-                if content.strip():
-                    data = json.loads(content)
-        except:
-            data = []
-
-    data.append(result_entry)
-
-    with open(output_path, "w") as f:
-        json.dump(data, f, indent=4)
-
-    print(f"Done: {tree} | {nheads_q}/{nheads_kv}")
-
+    
+    try:
+        seq_group, num_blocks = generate_tree_seqs(tree, block_size)
+        baseline = [
+            "vllm-fa",
+            "pat",
+            "flashinfer",
+        ]
+        if int(tree[0]) == 1 and tree[1] == ",":
+            baseline.extend(["ra", "ra++", "cascade", "deft"])
+ 
+        lats_std, corr_std = benchmark(
+            seq_group,
+            num_blocks,
+            nheads_q,
+            nheads_kv,
+            head_dim,
+            block_size,
+            n_repeats,
+            dtype,
+            device,
+            seed,
+            baselines=baseline,
+        )
+ 
+        lats_ft, corr_ft = {}, {}
+        if nheads_q // nheads_kv in [1, 4, 16]:
+            lats_ft, corr_ft = ft_benchmark(
+                tree,
+                nheads_q,
+                nheads_kv,
+                head_dim,
+                n_repeats,
+                dtype,
+                device,
+                baselines=["fa"],
+            )
+ 
+        lats_deft, corr_deft = {}, {}
+        lats_cascade, corr_cascade = {}, {}
+ 
+        if int(tree[0]) == 1 and tree[1] == ",":
+            lats_deft, corr_deft = DeFT_benchmark(
+                tree, nheads_q, nheads_kv, head_dim, n_repeats, dtype, device
+            )
+            lats_cascade, corr_cascade = cascade_benchmark(
+                tree, nheads_q, nheads_kv, head_dim, n_repeats, dtype, device
+            )
+ 
+        result_entry = {
+            "tree": tree,
+            "nheads_q": nheads_q,
+            "nheads_kv": nheads_kv,
+            "head_dim": head_dim,
+            "block_size": block_size,
+            "latencies": {**lats_std, **lats_ft, **lats_deft, **lats_cascade},
+            "correctness": {**corr_std, **corr_ft, **corr_deft, **corr_cascade},
+            "status": "success",
+            "error": None,
+        }
+        # print(result_entry)
+        
+    except Exception as e:
+        # 捕获异常信息
+        error_info = {
+            "type": type(e).__name__,
+            "message": str(e),
+            "traceback": traceback.format_exc()
+        }
+        result_entry["error"] = error_info
+        result_entry["status"] = "failed"
+        
+        # 打印错误信息
+        print(f"\n{'='*60}")
+        print(f"ERROR in benchmark: {tree} | {nheads_q}/{nheads_kv}")
+        print(f"{'='*60}")
+        print(f"Exception Type: {type(e).__name__}")
+        print(f"Message: {str(e)}")
+        print(f"\nTraceback:")
+        print(traceback.format_exc())
+        print(f"{'='*60}\n")
+        
+        # 取消下面注释可以在出错时打断点
+        # pdb.set_trace()
+        
+    finally:
+        # 无论成功或失败，都写入json文件
+        data = []
+        if os.path.exists(output_path):
+            try:
+                with open(output_path, "r") as f:
+                    content = f.read()
+                    if content.strip():
+                        data = json.loads(content)
+            except:
+                data = []
+ 
+        data.append(result_entry)
+ 
+        with open(output_path, "w") as f:
+            json.dump(data, f, indent=4)
+ 
+        status_icon = "✓" if result_entry["status"] == "success" else "✗"
+        print(f"Done: {tree} | {nheads_q}/{nheads_kv} [{status_icon}]")
+        if result_entry["status"] == "failed":
+            print(f"  Error: {result_entry['error']['type']}: {result_entry['error']['message']}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -715,6 +873,10 @@ if __name__ == "__main__":
     parser.add_argument("--nheads_q", type=int)
     parser.add_argument("--nheads_kv", type=int)
     parser.add_argument("--output_file", type=str)
+    # balance debug
+    # parser.add_argument("--pat_schedule", type=str, default="baseline",
+    #                    choices=["baseline", "sota"],
+    #                    help="PAT scheduling strategy: baseline (Python) or sota (C++ balancePackSota)")
 
     args = parser.parse_args()
 
@@ -730,6 +892,7 @@ if __name__ == "__main__":
         args.nheads_q,
         args.nheads_kv,
         args.output_file,
+        # args.pat_schedule, # balance debug
         head_dim,
         block_size,
         n_repeats,
@@ -737,3 +900,4 @@ if __name__ == "__main__":
         device,
         seed,
     )
+

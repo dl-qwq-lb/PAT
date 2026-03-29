@@ -103,29 +103,62 @@ def tree_benchmark(
 
     _start_build = time.perf_counter()
     seq_lens = seq_group.seqlens
-    tree = PrefixTreeCPP(block_size)
 
-    tree.build_radix_tree(seq_lens, table)
-    tree.pack_schedule(MNWs, nheads_q // nheads_kv, nheads_kv)
-    tree.kernel_info.to_gpu(torch.device(device))
+    # ----- step-2.1: build baseline & SOTA schedules (same inputs) -------------------------------------------
+    tree_baseline = PrefixTreeCPP(block_size)
+    tree_baseline.build_radix_tree(seq_lens, table)
+    tree_baseline.pack_schedule(MNWs, nheads_q // nheads_kv, nheads_kv, False)
+    tree_baseline.kernel_info.to_gpu(torch.device(device))
+
+    tree_sota = PrefixTreeCPP(block_size)
+    tree_sota.build_radix_tree(seq_lens, table)
+    tree_sota.pack_schedule(MNWs, nheads_q // nheads_kv, nheads_kv, True)
+    tree_sota.kernel_info.to_gpu(torch.device(device))
 
     # ----- step-3: run and compare results -------------------------------------------------------------------
-    # prefix-attention
+    # prefix-attention: baseline vs SOTA (same q / k / v)
     latencies = ""
-    out = torch.empty_like(q, device=device, dtype=dtype)
+    out_baseline = torch.empty_like(q, device=device, dtype=dtype)
+    out_sota = torch.empty_like(q, device=device, dtype=dtype)
 
-    def pa_func():
-        # print(q.shape, k_cache_paged.shape, v_cache_paged.shape, out.shape)
+    def pa_baseline_func():
         prefix_attn_with_kvcache(
             q=q,
             k_cache_paged=k_cache_paged,
             v_cache_paged=v_cache_paged,
-            tree=tree,
+            tree=tree_baseline,
             softmax_scale=scale,
-            out=out,
+            out=out_baseline,
         )
 
-    latencies += f"[INFO] kernel latency: PAT={Timer(pa_func, n_repeats):.3f}ms"
+    def pa_sota_func():
+        prefix_attn_with_kvcache(
+            q=q,
+            k_cache_paged=k_cache_paged,
+            v_cache_paged=v_cache_paged,
+            tree=tree_sota,
+            softmax_scale=scale,
+            out=out_sota,
+        )
+
+    baseline_latency = Timer(pa_baseline_func, n_repeats)
+    sota_latency = Timer(pa_sota_func, n_repeats)
+
+    latencies += (
+        f"[INFO] kernel latency: PAT-baseline={baseline_latency:.3f}ms, "
+        f"PAT-SOTA={sota_latency:.3f}ms"
+    )
+
+    # 数值正确性检查：SOTA 输出需与 baseline 一致
+    max_diff_bs = (out_baseline - out_sota).abs().max().item()
+    mean_diff_bs = (out_baseline - out_sota).abs().mean().item()
+    print(
+        f"[DEBUG] Max diff (baseline - SOTA): {max_diff_bs}",
+    )
+    print(
+        f"[DEBUG] Mean diff (baseline - SOTA): {mean_diff_bs}",
+    )
+    assert max_diff_bs <= max_error, "SOTA schedule output mismatch with baseline"
 
     # vllm-flash-attention
     if (
@@ -155,14 +188,15 @@ def tree_benchmark(
             num_splits=0,  # 0: best split;  1: do not split kv
         )
 
+        # 依旧使用 baseline 结果作为与 FlashAttention 的对比基准
         print(
-            f"[DEBUG] Max diff (PAT - FlashAttention): {(out - out_flash).abs().max().item()}"
+            f"[DEBUG] Max diff (PAT-baseline - FlashAttention): {(out_baseline - out_flash).abs().max().item()}"
         )
         print(
-            f"[DEBUG] Mean diff (PAT - FlashAttention): {(out - out_flash).abs().mean().item()}"
+            f"[DEBUG] Mean diff (PAT-baseline - FlashAttention): {(out_baseline - out_flash).abs().mean().item()}"
         )
         latencies += f"  |  FlashAttention={Timer(flash_func, n_repeats):.3f}ms"
-        assert (out - out_flash).abs().max().item() <= max_error, "out_flash error"
+        assert (out_baseline - out_flash).abs().max().item() <= max_error, "out_flash error"
 
     print(latencies)
     print("[INFO] successfully pass the test!")
@@ -262,15 +296,25 @@ def test_tree_attn_manual():
 
 if __name__ == "__main__":
     # test_tree_attn_manual()
-    test_tree_attn_kvcache(
-        nheads_q=32,
-        nheads_kv=8,
-        head_dim=128,
-        block_size=32,
-        tree="1,256_256,32",
-        n_repeats=1,
-        dtype=torch.float16,
-        device="cuda:0",
-        seed=0,
-        baselines=["all"],
-    )
+    
+    treetable = [
+        "1,10_4096,416",
+        "1,4,8,256_32,256,256,32",
+        "1,8,16,32,64,128,1024_256,128,64,32,32,32,32",
+        "4,16,256,512_512,32,128,32",
+        "256_4096",
+    ]
+    for trees in treetable:
+        test_tree_attn_kvcache(
+            nheads_q=32,
+            nheads_kv=8,
+            head_dim=128,
+            block_size=32,
+            tree=trees,
+            n_repeats=1,
+            dtype=torch.float16,
+            device="cuda:0",
+            seed=0,
+            baselines=["all"],
+        )
+

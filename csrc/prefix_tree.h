@@ -3,6 +3,8 @@
 #include <unordered_map>
 #include <algorithm>
 #include <iostream>
+#include <queue>
+#include <cstdlib>
 
 // 前缀树类定义
 
@@ -185,7 +187,8 @@ public:
     void pack_schedule(std::optional<std::vector<std::vector<int>>> MNWs,
                        int HRatio = 1,
                        int kvHead = 8,
-                       bool use_sota = false) {
+                       bool use_sota = false,
+                       int max_cta = -1) {
 
         std::vector<std::vector<int>> buckets;
         if (!MNWs.has_value() || MNWs->empty()) {
@@ -219,7 +222,7 @@ public:
 
         // Balance Pack
         if (use_sota) {
-            packed_boxes = balancePackSota(packed_boxes, kvHead, HRatio);
+            packed_boxes = balancePackSota(packed_boxes, kvHead, HRatio, max_cta);
         } else {
             packed_boxes = balancePack(packed_boxes, kvHead, HRatio);
         }
@@ -331,8 +334,9 @@ public:
 
     void pack_schedule_sota(std::optional<std::vector<std::vector<int>>> MNWs,
                              int HRatio = 1,
-                             int kvHead = 8) {
-        pack_schedule(MNWs, HRatio, kvHead, true);
+                             int kvHead = 8,
+                             int max_cta = -1) {
+        pack_schedule(MNWs, HRatio, kvHead, true, max_cta);
     }
 
 private:
@@ -633,32 +637,225 @@ private:
         return cropPack;
     }
 
-    std::vector<PackedBox> balancePackSota(const std::vector<PackedBox>& boxes, int kvHead, int HRatio = 1) {
-        // 示例：改进的负载均衡逻辑
-        // 1. 计算总块数和平均值（类似原函数）
-        int total_blocks = 0;
-        for (const auto& box : boxes) {
-            total_blocks += box.block_table_ptr->size();
+    std::vector<PackedBox> balancePackSota(const std::vector<PackedBox>& boxes,
+                                           int kvHead,
+                                           int HRatio = 1,
+                                           int max_cta = -1) {
+        // 设计目标：在严格保留 correctness 的前提下，从 _tree_heuristics 给出的初始 boxes 出发，
+        // 直接基于 KV 成本做贪心二分，而不再依赖 baseline 的 balancePack 预处理，只在 KV 维度做 split-KV，
+        // 以缓解 tail，并受 CTA 数与 split 次数上限约束。
+
+        if (boxes.empty()) return {};
+
+        // 1. 直接以 _tree_heuristics 的输出作为初始 crop，split_per_seq / CTA_rank 已在构建时初始化
+        std::vector<PackedBox> crop = boxes;
+        if (crop.empty()) return crop;
+
+        const int base_cta = (int)crop.size();
+
+        // 与 baseline 相同的最小 CTA 数逻辑，用于确定合理的增量上限
+        int threshold_cnt;
+        if      (kvHead <= 4)  threshold_cnt = 54;
+        else if (kvHead <= 8)  threshold_cnt = 27;
+        else if (kvHead <= 16) threshold_cnt = 13;
+        else if (kvHead <= 32) threshold_cnt = 6;
+        else                   threshold_cnt = 4;
+
+        // 允许的最大 CTA 数：在 baseline 基础上做温和放宽，避免过度碎片化
+        int CTA_target = base_cta;
+        int max_extra = base_cta; //std::min(base_cta, threshold_cnt);  // 至多增加约 1x threshold_cnt 个 CTA
+        CTA_target = std::min(base_cta * 2, base_cta + max_extra);
+
+        // 进一步受外部传入的 CTA 上限约束（例如 SM 数量 × 系数）。
+        if (max_cta > 0) {
+            CTA_target = std::min(CTA_target, max_cta);
         }
-        double avg_blocks = static_cast<double>(total_blocks) / boxes.size();
 
-        // 2. 改进阈值计算（例如，更动态的阈值）
-        double threshold = avg_blocks * 1.2;  // 示例：比原函数更保守的阈值
+        auto compute_cost = [&](const PackedBox& b) -> double {
+            int qn = std::max(1, (int)b.q_table.size());
+            double alpha = 1.0;
+            double beta  = 1.0 / std::max(1, HRatio);
+            return alpha * qn + beta * std::max(1, b.kv_in_CTA);
+        };
 
-        // 3. 分组逻辑（简化示例，实际需实现完整算法）
-        std::vector<PackedBox> cropPack;
-        for (const auto& box : boxes) {
-            if (box.block_table_ptr->size() > threshold) {
-                // 拆分逻辑（需实现）
-                // ...
-            } else {
-                cropPack.push_back(box);
+        // 全局失衡度统计：c_max / c_avg，用于决定是否启用 SOTA 额外拆分
+        double global_max_cost = 0.0;
+        double global_sum_cost = 0.0;
+        for (const auto& b : crop) {
+            double c = compute_cost(b);
+            global_sum_cost += c;
+            if (c > global_max_cost) global_max_cost = c;
+        }
+
+        double global_avg_cost = 0.0;
+        if (!crop.empty()) {
+            global_avg_cost = global_sum_cost / (double)crop.size();
+        }
+
+        double imbalance_ratio = 1.0;
+        if (global_avg_cost > 0.0) {
+            imbalance_ratio = global_max_cost / global_avg_cost;
+        }
+
+        // 可选调试输出：设置环境变量 PAT_DEBUG_IMBALANCE 即可在运行时打印
+        if (std::getenv("PAT_DEBUG_IMBALANCE") != nullptr) {
+            std::cout << "[balancePackSota] kvHead=" << kvHead
+                      << ", HRatio=" << HRatio
+                      << ", base_cta=" << base_cta
+                      << ", c_max=" << global_max_cost
+                      << ", c_avg=" << global_avg_cost
+                      << ", ratio=" << imbalance_ratio
+                      << std::endl;
+        }
+
+        // // 全局失衡 gating：若 baseline 已经足够均衡，则直接复用 baseline 调度
+        // const double imbalance_threshold = 1.35;  // 可以根据统计结果再调
+        // if (imbalance_ratio < imbalance_threshold) {
+        //     return crop;
+        // }
+
+        // 估算将单个盒子做一次二分（split_k=2）后，两段中较大的 cost。
+        auto estimate_two_way_split_max_cost = [&](const PackedBox& src) -> double {
+            if (!src.block_table_ptr || src.block_table_ptr->size() < 2) {
+                return compute_cost(src);
             }
+
+            int total_blocks = (int)src.block_table_ptr->size();
+            int blk0 = total_blocks / 2 + (total_blocks % 2);  // 前半部分，向上取整
+            int blk1 = total_blocks - blk0;
+
+            int kv_total = std::max(0, src.kv_in_CTA);
+
+            // 第一段：从 offset=0 开始，容量为 blk0 * block_size
+            int cap0 = blk0 * block_size;
+            int kv0 = std::min(kv_total, cap0);
+
+            // 第二段：从 offset = blk0 * block_size 开始
+            int offset1 = blk0 * block_size;
+            int remain1 = kv_total - offset1;
+            int cap1 = blk1 * block_size;
+            int kv1 = 0;
+            if (remain1 > 0 && cap1 > 0) {
+                kv1 = std::min(remain1, cap1);
+            }
+
+            int qn = std::max(1, (int)src.q_table.size());
+            double alpha = 1.0;
+            double beta  = 1.0 / std::max(1, HRatio);
+
+            double cost0 = alpha * qn + beta * std::max(1, kv0);
+            double cost1 = alpha * qn + beta * std::max(1, kv1);
+            return std::max(cost0, cost1);
+        };
+
+        // 复用 baseline 的 token 计数与 CTA_rank / split_per_seq 更新规则，仅做 KV 二分
+        auto split_box_even_blocks = [&](PackedBox& src, int split_k, std::vector<PackedBox>& out) {
+            if (!src.block_table_ptr) {
+                out.push_back(std::move(src));
+                return;
+            }
+
+            int total_blocks = (int)src.block_table_ptr->size();
+            if (split_k <= 1 || total_blocks <= 1) {
+                out.push_back(std::move(src));
+                return;
+            }
+
+            int base_sz = total_blocks / split_k;
+            int rem  = total_blocks % split_k;
+            int start = 0;
+
+            for (int i = 0; i < split_k; ++i) {
+                int blk_cnt = base_sz + (i < rem ? 1 : 0);
+                int end = start + blk_cnt;
+                if (blk_cnt <= 0 || start >= total_blocks) break;
+                if (end > total_blocks) end = total_blocks;
+
+                PackedBox sub;
+                sub.q_table          = src.q_table;
+                sub.num_seqs_per_CTA = src.num_seqs_per_CTA;
+
+                auto vec = std::make_shared<std::vector<int>>();
+                vec->assign(src.block_table_ptr->begin() + start,
+                            src.block_table_ptr->begin() + end);
+                sub.block_table_ptr = vec;
+
+                // 与 baseline 完全一致的 token 计算方式
+                int offset_tokens    = start * block_size;
+                int chunk_cap_tokens = (end - start) * block_size;
+                int remain_tokens    = src.kv_in_CTA - offset_tokens;
+                sub.kv_in_CTA        = std::max(0, std::min(remain_tokens, chunk_cap_tokens));
+
+                if (i == 0) {
+                    // 第一段沿用原 CTA_rank
+                    sub.CTA_rank = src.CTA_rank;
+                } else if (!sub.q_table.empty()) {
+                    // 后续段按 baseline 规则为每条 seq 增加一个新的 rank
+                    sub.CTA_rank = split_per_seq[sub.q_table[0]];
+                    for (int qid : sub.q_table) {
+                        split_per_seq[qid]++;
+                    }
+                }
+
+                out.push_back(std::move(sub));
+                start = end;
+                if (start >= total_blocks) break;
+            }
+        };
+
+        auto get_max_split = [&]() {
+            int m = 0;
+            for (int v : split_per_seq) if (v > m) m = v;
+            return m;
+        };
+
+        // 2. 基于 KV 成本的贪心二分：总是对当前最重且“拆分收益明显”的盒子做一次二分
+        //    这里引入基于 base_cta 的动态 epsilon：CTA 数越大，要求单次拆分收益越高，避免在
+        //    已经高并发的场景中过度拆箱。
+        while ((int)crop.size() < CTA_target && get_max_split() < 32) {
+            double split_epsilon;
+            if (base_cta <= 128) {
+                split_epsilon = 0.10;   // CTA 较少，允许更激进的拆分
+            } else if (base_cta <= 512) {
+                split_epsilon = 0.15;   // 中等规模 CTA，适中收益门槛
+            } else {
+                split_epsilon = 0.22;   // CTA 已很多，只接受非常明显的收益
+            }
+            int best_idx = -1;
+            double best_cost = 0.0;
+            bool found_beneficial = false;
+
+            for (int i = 0; i < (int)crop.size(); ++i) {
+                const auto& b = crop[i];
+                if (!b.block_table_ptr || b.block_table_ptr->size() < 2) continue;
+
+                double orig_cost = compute_cost(b);
+                double new_max_cost = estimate_two_way_split_max_cost(b);
+
+                // 只有当拆分后两段中最大的 cost 明显小于原 cost 时，才认为这一拆分“值得”
+                if (new_max_cost <= orig_cost * (1.0 - split_epsilon)) {
+                    if (!found_beneficial || orig_cost > best_cost) {
+                        found_beneficial = true;
+                        best_idx = i;
+                        best_cost = orig_cost;
+                    }
+                }
+            }
+
+            if (!found_beneficial || best_idx == -1) {
+                break;  // 当前没有任何满足收益条件的拆分，终止循环
+            }
+
+            PackedBox pack = std::move(crop[best_idx]);
+            if (best_idx != (int)crop.size() - 1) {
+                crop[best_idx] = std::move(crop.back());
+            }
+            crop.pop_back();
+
+            // 对该盒子进行一次二分：只拆 KV，不拆 query
+            split_box_even_blocks(pack, 2, crop);
         }
 
-        // 更新 split_per_seq 等状态
-        // ...
-
-        return cropPack;
+        return crop;
     }
 };
