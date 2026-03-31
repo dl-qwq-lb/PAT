@@ -6,37 +6,37 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "flashinfer": 0.9399360120296478,
-            "vllm-fa": 1.21343994140625,
-            "ra++": 0.4285439997911453,
-            "ra": 0.42953599989414215,
-            "pat_baseline": 0.32153600454330444,
-            "pat_sota": 0.31988799571990967,
-            "FastTree": 0.3572639971971512,
-            "fa": 1.8917759656906128,
-            "DeFT": 0.4156479984521866,
-            "cascade": 0.8468480110168457
+            "flashinfer": 0.9410560131072998,
+            "vllm-fa": 1.3235199451446533,
+            "ra++": 0.38707199692726135,
+            "ra": 0.3691520094871521,
+            "pat_baseline": 0.3132320046424866,
+            "pat_sota": 0.30617600679397583,
+            "FastTree": 0.3486720025539398,
+            "fa": 1.8763839602470398,
+            "DeFT": 0.4039040058851242,
+            "cascade": 0.4638720005750656
         },
         "correctness": {
             "flashinfer": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 1.0132789611816406e-06
+                "mean_diff": 1.3709068298339844e-06
             },
             "ra++": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 0.00012421607971191406
+                "mean_diff": 0.0001227855682373047
             },
             "ra": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 0.00012421607971191406
+                "mean_diff": 0.0001227855682373047
             },
             "pat_baseline": {
                 "status": "PASSED",
-                "max_diff": 0.0009765625,
-                "mean_diff": 5.960464477539062e-07
+                "max_diff": 0.001953125,
+                "mean_diff": 7.748603820800781e-07
             },
             "pat_sota": {
                 "status": "PASSED",
@@ -46,7 +46,7 @@
             "FastTree": {
                 "status": "PASSED",
                 "max_diff": 6.103515625e-05,
-                "mean_diff": 4.827976226806641e-06
+                "mean_diff": 4.887580871582031e-06
             },
             "DeFT": {
                 "status": "PASSED",
@@ -64,40 +64,40 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "flashinfer": 0.34406399726867676,
-            "vllm-fa": 0.4561920017004013,
-            "ra++": 0.41152000427246094,
-            "ra": 0.4055039882659912,
-            "pat_baseline": 0.14745600521564484,
-            "pat_sota": 0.131071999669075,
-            "DeFT": 0.29129599034786224,
-            "cascade": 0.6144000291824341
+            "flashinfer": 0.9871360063552856,
+            "vllm-fa": 0.5124960243701935,
+            "ra++": 0.4115840047597885,
+            "ra": 0.4095039963722229,
+            "pat_baseline": 0.14230399578809738,
+            "pat_sota": 0.1377279981970787,
+            "DeFT": 0.28865599632263184,
+            "cascade": 0.522159993648529
         },
         "correctness": {
             "flashinfer": {
                 "status": "PASSED",
                 "max_diff": 0.0009765625,
-                "mean_diff": 4.708766937255859e-06
+                "mean_diff": 4.827976226806641e-06
             },
             "ra++": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 1.9669532775878906e-05
+                "mean_diff": 1.8537044525146484e-05
             },
             "ra": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 1.9669532775878906e-05
+                "mean_diff": 1.8537044525146484e-05
             },
             "pat_baseline": {
                 "status": "PASSED",
                 "max_diff": 0.0009765625,
-                "mean_diff": 3.6954879760742188e-06
+                "mean_diff": 3.874301910400391e-06
             },
             "pat_sota": {
                 "status": "PASSED",
-                "max_diff": 0.00048828125,
-                "mean_diff": 3.2782554626464844e-06
+                "max_diff": 0.0009765625,
+                "mean_diff": 3.2186508178710938e-06
             },
             "DeFT": {
                 "status": "PASSED",
@@ -115,42 +115,42 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "flashinfer": 0.3476479947566986,
-            "vllm-fa": 0.664031982421875,
-            "ra++": 0.41415999829769135,
-            "ra": 0.40755200386047363,
-            "pat_baseline": 0.14215999841690063,
-            "pat_sota": 0.1340319961309433,
-            "FastTree": 0.4116480052471161,
-            "fa": 0.38604798913002014,
-            "DeFT": 0.2979840040206909,
-            "cascade": 0.6256639957427979
+            "flashinfer": 0.3399679958820343,
+            "vllm-fa": 0.4904960095882416,
+            "ra++": 0.4023360013961792,
+            "ra": 0.4012800008058548,
+            "pat_baseline": 0.14336000382900238,
+            "pat_sota": 0.13926400244235992,
+            "FastTree": 0.4116320013999939,
+            "fa": 0.3829759955406189,
+            "DeFT": 0.2908160090446472,
+            "cascade": 0.562175989151001
         },
         "correctness": {
             "flashinfer": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 4.827976226806641e-06
+                "mean_diff": 4.708766937255859e-06
             },
             "ra++": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 1.9788742065429688e-05
+                "mean_diff": 1.895427703857422e-05
             },
             "ra": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 1.9788742065429688e-05
+                "mean_diff": 1.895427703857422e-05
             },
             "pat_baseline": {
                 "status": "PASSED",
-                "max_diff": 0.0009765625,
-                "mean_diff": 3.6954879760742188e-06
+                "max_diff": 0.001953125,
+                "mean_diff": 3.7550926208496094e-06
             },
             "pat_sota": {
                 "status": "PASSED",
-                "max_diff": 0.0009765625,
-                "mean_diff": 3.2782554626464844e-06
+                "max_diff": 0.00048828125,
+                "mean_diff": 3.0994415283203125e-06
             },
             "FastTree": {
                 "status": "PASSED",
@@ -173,45 +173,1399 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "flashinfer": 0.347135990858078,
-            "vllm-fa": 0.6492159962654114,
-            "ra++": 0.41415999829769135,
-            "ra": 0.4147839993238449,
-            "pat_baseline": 0.17185600101947784,
-            "pat_sota": 0.17193599790334702,
-            "DeFT": 1.2738560438156128,
-            "cascade": 0.8217119872570038
+            "flashinfer": 1.0019840002059937,
+            "vllm-fa": 0.5171039998531342,
+            "ra++": 0.40089599788188934,
+            "ra": 0.40038400888442993,
+            "pat_baseline": 0.1730560064315796,
+            "pat_sota": 0.16678400337696075,
+            "DeFT": 1.2757440209388733,
+            "cascade": 0.78438401222229
         },
         "correctness": {
             "flashinfer": {
                 "status": "PASSED",
-                "max_diff": 0.001953125,
+                "max_diff": 0.0009765625,
                 "mean_diff": 4.708766937255859e-06
             },
             "ra++": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 2.0325183868408203e-05
+                "mean_diff": 1.9669532775878906e-05
             },
             "ra": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 2.0325183868408203e-05
+                "mean_diff": 1.9669532775878906e-05
             },
             "pat_baseline": {
                 "status": "PASSED",
-                "max_diff": 0.00048828125,
+                "max_diff": 0.001953125,
                 "mean_diff": 3.0994415283203125e-06
             },
             "pat_sota": {
                 "status": "PASSED",
-                "max_diff": 0.00048828125,
-                "mean_diff": 2.9802322387695312e-06
+                "max_diff": 0.001953125,
+                "mean_diff": 3.0994415283203125e-06
             },
             "DeFT": {
                 "status": "PASSED",
                 "max_diff": 6.103515625e-05,
-                "mean_diff": 6.079673767089844e-06
+                "mean_diff": 6.020069122314453e-06
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,256_256,32",
+        "nheads_q": 32,
+        "nheads_kv": 32,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 1.0557440519332886,
+            "vllm-fa": 2.456576108932495,
+            "ra++": 1.0413439869880676,
+            "ra": 0.4833280146121979,
+            "pat_baseline": 0.3373599946498871,
+            "pat_sota": 0.3317759931087494,
+            "FastTree": 0.4864000082015991,
+            "fa": 3.0090240240097046,
+            "DeFT": 0.5416960120201111,
+            "cascade": 1.1263999938964844
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 5.364418029785156e-07
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 0.0001367330551147461
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 0.0001367330551147461
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 2.384185791015625e-07
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 2.384185791015625e-07
+            },
+            "FastTree": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 1.5497207641601562e-05
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 2.2113323211669922e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,256_256,32",
+        "nheads_q": 16,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 0.5053440034389496,
+            "vllm-fa": 0.8606719970703125,
+            "ra++": 0.3891200125217438,
+            "ra": 0.38707199692726135,
+            "pat_baseline": 0.15667200088500977,
+            "pat_sota": 0.14847999811172485,
+            "DeFT": 0.43007999658584595,
+            "cascade": 1.1325440406799316
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.5556812286376953e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 2.5510787963867188e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 2.5510787963867188e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 2.7418136596679688e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 2.7418136596679688e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 2.2232532501220703e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,256_256,32",
+        "nheads_q": 32,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 0.5923839807510376,
+            "vllm-fa": 0.7884480059146881,
+            "ra++": 0.3624959886074066,
+            "ra": 0.3569120019674301,
+            "pat_baseline": 0.19251200556755066,
+            "pat_sota": 0.18636800348758698,
+            "FastTree": 0.37939199805259705,
+            "fa": 0.7940160036087036,
+            "DeFT": 0.4403199851512909,
+            "cascade": 1.3660160303115845
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.5914440155029297e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.9073486328125e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 2.1338462829589844e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 2.9802322387695312e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 2.9802322387695312e-06
+            },
+            "FastTree": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 1.5556812286376953e-05
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 2.205371856689453e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,256_256,32",
+        "nheads_q": 64,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 0.5877760052680969,
+            "vllm-fa": 0.9374719858169556,
+            "ra++": 0.4055039882659912,
+            "ra": 0.35177600383758545,
+            "pat_baseline": 0.27592000365257263,
+            "pat_sota": 0.26768000423908234,
+            "DeFT": 1.8831360340118408,
+            "cascade": 0.41625599563121796
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.615285873413086e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.7642974853515625e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.990795135498047e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 3.039836883544922e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 3.039836883544922e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 2.2172927856445312e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,1024_2048,32",
+        "nheads_q": 32,
+        "nheads_kv": 32,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {},
+        "correctness": {},
+        "status": "failed",
+        "error": {
+            "type": "OutOfMemoryError",
+            "message": "CUDA out of memory. Tried to allocate 16.25 GiB. GPU 0 has a total capacity of 9.67 GiB of which 8.87 GiB is free. Process 2170454 has 816.00 MiB memory in use. Of the allocated memory 552.76 MiB is allocated by PyTorch, and 13.24 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)",
+            "traceback": "Traceback (most recent call last):\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 774, in run_benchmark\n    lats_std, corr_std = benchmark(\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 113, in benchmark\n    ) = generate_random_kv_cache(\n  File \"/usr/local/lib/python3.10/dist-packages/prefix_attn/utils.py\", line 35, in generate_random_kv_cache\n    k_cache = k_cache_paged[block_table]  # (batch_size, num_blocks, block_size, nheads_kv, head_dim)\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 16.25 GiB. GPU 0 has a total capacity of 9.67 GiB of which 8.87 GiB is free. Process 2170454 has 816.00 MiB memory in use. Of the allocated memory 552.76 MiB is allocated by PyTorch, and 13.24 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
+        }
+    },
+    {
+        "tree": "1,1024_2048,32",
+        "nheads_q": 16,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 5.254592180252075,
+            "vllm-fa": 11.905423641204834,
+            "ra++": 1.4452959895133972,
+            "ra": 0.7976639866828918,
+            "pat_baseline": 0.6589440107345581,
+            "pat_sota": 0.6804479956626892,
+            "DeFT": 2.1089279651641846,
+            "cascade": 1.084831953048706
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 6.794929504394531e-06
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 2.0742416381835938e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 2.1159648895263672e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 5.960464477539062e-07
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 5.960464477539062e-07
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.0001220703125,
+                "mean_diff": 9.119510650634766e-06
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,1024_2048,32",
+        "nheads_q": 32,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 5.3488640785217285,
+            "vllm-fa": 11.921328067779541,
+            "ra++": 1.8575360178947449,
+            "ra": 1.1786240339279175,
+            "pat_baseline": 1.0689440369606018,
+            "pat_sota": 1.1479040384292603,
+            "FastTree": 1.3803520202636719,
+            "fa": 21.03500747680664,
+            "DeFT": 2.5221118927001953,
+            "cascade": 1.58515202999115
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 7.092952728271484e-06
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.3053417205810547e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.3470649719238281e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 5.960464477539062e-07
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 5.960464477539062e-07
+            },
+            "FastTree": {
+                "status": "PASSED",
+                "max_diff": 0.0001220703125,
+                "mean_diff": 7.510185241699219e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 9.119510650634766e-06
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,1024_2048,32",
+        "nheads_q": 64,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 5.404160022735596,
+            "vllm-fa": 11.93881607055664,
+            "ra++": 2.6731520891189575,
+            "ra": 1.9553279876708984,
+            "pat_baseline": 2.1492639780044556,
+            "pat_sota": 2.0992000102996826,
+            "DeFT": 15.309823989868164,
+            "cascade": 2.4381439685821533
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 7.271766662597656e-06
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 9.238719940185547e-06
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 9.655952453613281e-06
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 5.960464477539062e-07
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 5.960464477539062e-07
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.0001220703125,
+                "mean_diff": 9.119510650634766e-06
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,2,64_1024,256,256",
+        "nheads_q": 32,
+        "nheads_kv": 32,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 1.1545599699020386,
+            "vllm-fa": 2.4002559185028076,
+            "ra++": 0.9236479997634888,
+            "ra": 1.3833920359611511,
+            "pat_baseline": 0.6005759835243225,
+            "pat_sota": 0.6234239935874939,
+            "FastTree": 0.6516799926757812,
+            "fa": 3.977728009223938,
+            "DeFT": 0.6850559711456299,
+            "cascade": 0.7766239941120148
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 8.940696716308594e-07
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 0.00013148784637451172
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 0.00013148784637451172
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 4.172325134277344e-07
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 4.76837158203125e-07
+            },
+            "FastTree": {
+                "status": "PASSED",
+                "max_diff": 0.0001220703125,
+                "mean_diff": 8.046627044677734e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.0001220703125,
+                "mean_diff": 1.055002212524414e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,2,64_1024,256,256",
+        "nheads_q": 16,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 0.5334239900112152,
+            "vllm-fa": 0.8499199748039246,
+            "ra++": 0.37727999687194824,
+            "ra": 0.44543999433517456,
+            "pat_baseline": 0.20723199844360352,
+            "pat_sota": 0.2181120067834854,
+            "DeFT": 0.4259839951992035,
+            "cascade": 0.6461439728736877
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 7.510185241699219e-06
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 2.5212764739990234e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 2.5451183319091797e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 2.9206275939941406e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 4.708766937255859e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.0001220703125,
+                "mean_diff": 1.055002212524414e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,2,64_1024,256,256",
+        "nheads_q": 32,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 0.5166079998016357,
+            "vllm-fa": 0.8586239814758301,
+            "ra++": 0.388032004237175,
+            "ra": 0.45875200629234314,
+            "pat_baseline": 0.2314240038394928,
+            "pat_sota": 0.24371199309825897,
+            "FastTree": 0.37887999415397644,
+            "fa": 1.0588159561157227,
+            "DeFT": 0.45260798931121826,
+            "cascade": 0.4357120096683502
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 7.569789886474609e-06
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 2.4437904357910156e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 2.4616718292236328e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 2.9802322387695312e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 4.708766937255859e-06
+            },
+            "FastTree": {
+                "status": "PASSED",
+                "max_diff": 0.0001220703125,
+                "mean_diff": 7.987022399902344e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.0001220703125,
+                "mean_diff": 1.055002212524414e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,2,64_1024,256,256",
+        "nheads_q": 64,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 0.6168639957904816,
+            "vllm-fa": 0.8007680177688599,
+            "ra++": 0.38604800403118134,
+            "ra": 0.48844799399375916,
+            "pat_baseline": 0.27238398790359497,
+            "pat_sota": 0.29019200801849365,
+            "DeFT": 2.691007971763611,
+            "cascade": 1.383840024471283
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 7.62939453125e-06
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 2.4199485778808594e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 2.4437904357910156e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 2.9802322387695312e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 4.649162292480469e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.0001220703125,
+                "mean_diff": 1.055002212524414e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,4,256_32,256,32",
+        "nheads_q": 32,
+        "nheads_kv": 32,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 1.1519200205802917,
+            "vllm-fa": 2.4524800777435303,
+            "ra++": 2.5855679512023926,
+            "ra": 3.2107518911361694,
+            "pat_baseline": 0.34039999544620514,
+            "pat_sota": 0.33271999657154083,
+            "FastTree": 0.5120000243186951,
+            "fa": 3.39353609085083,
+            "DeFT": 0.6020959913730621,
+            "cascade": 0.9497599899768829
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 8.52346420288086e-06
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 5.918741226196289e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 5.906820297241211e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 4.112720489501953e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 4.112720489501953e-06
+            },
+            "FastTree": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 1.4662742614746094e-05
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 2.09808349609375e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,4,256_32,256,32",
+        "nheads_q": 16,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 0.5340160131454468,
+            "vllm-fa": 0.8642560243606567,
+            "ra++": 0.7004160284996033,
+            "ra": 0.8150559961795807,
+            "pat_baseline": 0.1544800028204918,
+            "pat_sota": 0.1515360027551651,
+            "DeFT": 0.45977601408958435,
+            "cascade": 0.6277120113372803
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 1.52587890625e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 2.1338462829589844e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 2.1219253540039062e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 5.9604644775390625e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 5.9604644775390625e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 2.1159648895263672e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,4,256_32,256,32",
+        "nheads_q": 32,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 0.6424160003662109,
+            "vllm-fa": 0.8970239758491516,
+            "ra++": 0.7255520224571228,
+            "ra": 0.8355199992656708,
+            "pat_baseline": 0.21299199759960175,
+            "pat_sota": 0.20787200331687927,
+            "FastTree": 0.4094879925251007,
+            "fa": 0.8908799886703491,
+            "DeFT": 0.49910400807857513,
+            "cascade": 0.6272000074386597
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.52587890625e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 2.104043960571289e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 2.09808349609375e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 5.9604644775390625e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 5.9604644775390625e-06
+            },
+            "FastTree": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 1.4722347259521484e-05
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 2.104043960571289e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,4,256_32,256,32",
+        "nheads_q": 64,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 0.6369280219078064,
+            "vllm-fa": 0.8052799999713898,
+            "ra++": 0.7459840178489685,
+            "ra": 0.8376320004463196,
+            "pat_baseline": 0.29388800263404846,
+            "pat_sota": 0.29238399863243103,
+            "DeFT": 2.1806079149246216,
+            "cascade": 0.8258560001850128
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.5556812286376953e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.8775463104248047e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.8656253814697266e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 6.139278411865234e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 6.139278411865234e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 2.09808349609375e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,8,512_32,512,256",
+        "nheads_q": 32,
+        "nheads_kv": 32,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {},
+        "correctness": {},
+        "status": "failed",
+        "error": {
+            "type": "OutOfMemoryError",
+            "message": "CUDA out of memory. Tried to allocate 1.03 GiB. GPU 0 has a total capacity of 9.67 GiB of which 944.88 MiB is free. Process 2181979 has 8.74 GiB memory in use. Of the allocated memory 8.33 GiB is allocated by PyTorch, and 173.00 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)",
+            "traceback": "Traceback (most recent call last):\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 790, in run_benchmark\n    lats_ft, corr_ft = ft_benchmark(\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 326, in ft_benchmark\n    qkv_preparation(tree_info, nheads_q, nheads_kv, head_dim, device, dtype)\n  File \"/workspace/PAT/benchmark/FastTree.py\", line 455, in qkv_preparation\n    K_tree_tensor = torch.cat(K_tree_tensor, dim=1).reshape(\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.03 GiB. GPU 0 has a total capacity of 9.67 GiB of which 944.88 MiB is free. Process 2181979 has 8.74 GiB memory in use. Of the allocated memory 8.33 GiB is allocated by PyTorch, and 173.00 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
+        }
+    },
+    {
+        "tree": "1,8,512_32,512,256",
+        "nheads_q": 16,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 1.4648319482803345,
+            "vllm-fa": 2.7432000637054443,
+            "ra++": 2.5404480695724487,
+            "ra": 4.139103889465332,
+            "pat_baseline": 1.0879520177841187,
+            "pat_sota": 1.0890239477157593,
+            "DeFT": 2.160096049308777,
+            "cascade": 1.0331680178642273
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 1.0907649993896484e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.2159347534179688e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.2159347534179688e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 6.556510925292969e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 6.556510925292969e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 1.4185905456542969e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,8,512_32,512,256",
+        "nheads_q": 32,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 1.6087039709091187,
+            "vllm-fa": 2.7678720951080322,
+            "ra++": 2.6767040491104126,
+            "ra": 4.23523211479187,
+            "pat_baseline": 1.1588959693908691,
+            "pat_sota": 1.1735519766807556,
+            "FastTree": 1.1059199571609497,
+            "fa": 4.285327911376953,
+            "DeFT": 2.3930881023406982,
+            "cascade": 1.416703999042511
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.0907649993896484e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.1801719665527344e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.1801719665527344e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 6.616115570068359e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 6.616115570068359e-06
+            },
+            "FastTree": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 1.1265277862548828e-05
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 1.4126300811767578e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,8,512_32,512,256",
+        "nheads_q": 64,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 1.5088160037994385,
+            "vllm-fa": 2.7417598962783813,
+            "ra++": 2.7289600372314453,
+            "ra": 4.192255973815918,
+            "pat_baseline": 1.3306879997253418,
+            "pat_sota": 1.3742079734802246,
+            "DeFT": 18.73761558532715,
+            "cascade": 1.5134719610214233
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.0967254638671875e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.1801719665527344e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.1742115020751953e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 6.616115570068359e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 6.616115570068359e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 1.4126300811767578e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,8,512_32,2048,256",
+        "nheads_q": 32,
+        "nheads_kv": 32,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {},
+        "correctness": {},
+        "status": "failed",
+        "error": {
+            "type": "OutOfMemoryError",
+            "message": "CUDA out of memory. Tried to allocate 9.12 GiB. GPU 0 has a total capacity of 9.67 GiB of which 7.15 GiB is free. Process 2188246 has 2.52 GiB memory in use. Of the allocated memory 2.25 GiB is allocated by PyTorch, and 21.07 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)",
+            "traceback": "Traceback (most recent call last):\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 774, in run_benchmark\n    lats_std, corr_std = benchmark(\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 113, in benchmark\n    ) = generate_random_kv_cache(\n  File \"/usr/local/lib/python3.10/dist-packages/prefix_attn/utils.py\", line 35, in generate_random_kv_cache\n    k_cache = k_cache_paged[block_table]  # (batch_size, num_blocks, block_size, nheads_kv, head_dim)\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 9.12 GiB. GPU 0 has a total capacity of 9.67 GiB of which 7.15 GiB is free. Process 2188246 has 2.52 GiB memory in use. Of the allocated memory 2.25 GiB is allocated by PyTorch, and 21.07 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
+        }
+    },
+    {
+        "tree": "1,8,512_32,2048,256",
+        "nheads_q": 16,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 3.5102720260620117,
+            "vllm-fa": 7.027199983596802,
+            "ra++": 7.067647933959961,
+            "ra": 12.13484811782837,
+            "pat_baseline": 1.3158400058746338,
+            "pat_sota": 1.19131201505661,
+            "DeFT": 2.63372802734375,
+            "cascade": 1.2718080282211304
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 6.9141387939453125e-06
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 7.569789886474609e-06
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 7.569789886474609e-06
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 6.020069122314453e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 2.86102294921875e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.0001220703125,
+                "mean_diff": 8.64267349243164e-06
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,8,512_32,2048,256",
+        "nheads_q": 32,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 3.4462720155715942,
+            "vllm-fa": 7.0210559368133545,
+            "ra++": 7.056847810745239,
+            "ra": 12.149248123168945,
+            "pat_baseline": 1.5144960284233093,
+            "pat_sota": 1.4315520524978638,
+            "FastTree": 1.4088799953460693,
+            "fa": 11.831808090209961,
+            "DeFT": 2.9250080585479736,
+            "cascade": 1.6168320178985596
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 6.973743438720703e-06
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 7.450580596923828e-06
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 7.450580596923828e-06
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 6.020069122314453e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 2.86102294921875e-06
+            },
+            "FastTree": {
+                "status": "PASSED",
+                "max_diff": 0.0001220703125,
+                "mean_diff": 7.033348083496094e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.0001220703125,
+                "mean_diff": 8.64267349243164e-06
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,8,512_32,2048,256",
+        "nheads_q": 64,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 3.5404640436172485,
+            "vllm-fa": 6.904799938201904,
+            "ra++": 7.168400049209595,
+            "ra": 12.182527542114258,
+            "pat_baseline": 1.836463987827301,
+            "pat_sota": 1.9041279554367065,
+            "DeFT": 22.72051239013672,
+            "cascade": 2.0085760354995728
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 6.973743438720703e-06
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 7.450580596923828e-06
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 7.450580596923828e-06
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 2.86102294921875e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 2.86102294921875e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.0001220703125,
+                "mean_diff": 8.64267349243164e-06
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,8,512_512,512,256",
+        "nheads_q": 32,
+        "nheads_kv": 32,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {},
+        "correctness": {},
+        "status": "failed",
+        "error": {
+            "type": "OutOfMemoryError",
+            "message": "CUDA out of memory. Tried to allocate 5.00 GiB. GPU 0 has a total capacity of 9.67 GiB of which 2.33 GiB is free. Process 2195426 has 7.34 GiB memory in use. Of the allocated memory 7.07 GiB is allocated by PyTorch, and 17.77 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)",
+            "traceback": "Traceback (most recent call last):\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 774, in run_benchmark\n    lats_std, corr_std = benchmark(\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 113, in benchmark\n    ) = generate_random_kv_cache(\n  File \"/usr/local/lib/python3.10/dist-packages/prefix_attn/utils.py\", line 36, in generate_random_kv_cache\n    v_cache = v_cache_paged[block_table]  # (batch_size, num_blocks, block_size, nheads_kv, head_dim)\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 5.00 GiB. GPU 0 has a total capacity of 9.67 GiB of which 2.33 GiB is free. Process 2195426 has 7.34 GiB memory in use. Of the allocated memory 7.07 GiB is allocated by PyTorch, and 17.77 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
+        }
+    },
+    {
+        "tree": "1,8,512_512,512,256",
+        "nheads_q": 16,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 2.0556799173355103,
+            "vllm-fa": 3.87174391746521,
+            "ra++": 2.6716160774230957,
+            "ra": 4.226047992706299,
+            "pat_baseline": 1.0827839970588684,
+            "pat_sota": 1.092527985572815,
+            "DeFT": 2.268048048019409,
+            "cascade": 1.2682240009307861
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 8.58306884765625e-06
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.7762184143066406e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.823902130126953e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 3.5762786865234375e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 3.5762786865234375e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.0001220703125,
+                "mean_diff": 1.150369644165039e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,8,512_512,512,256",
+        "nheads_q": 32,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 1.9486719965934753,
+            "vllm-fa": 3.833280086517334,
+            "ra++": 2.8246880769729614,
+            "ra": 4.237823963165283,
+            "pat_baseline": 1.2093440294265747,
+            "pat_sota": 1.2364320158958435,
+            "FastTree": 1.1694079637527466,
+            "fa": 6.594559907913208,
+            "DeFT": 2.4396640062332153,
+            "cascade": 1.2108800411224365
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 8.821487426757812e-06
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.430511474609375e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.4781951904296875e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 3.635883331298828e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 3.635883331298828e-06
+            },
+            "FastTree": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 9.298324584960938e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 1.150369644165039e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,8,512_512,512,256",
+        "nheads_q": 64,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 2.112480044364929,
+            "vllm-fa": 3.8553600311279297,
+            "ra++": 2.8763840198516846,
+            "ra": 4.353535890579224,
+            "pat_baseline": 1.4428160190582275,
+            "pat_sota": 1.5011360049247742,
+            "DeFT": 19.391024589538574,
+            "cascade": 1.4612480401992798
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 8.940696716308594e-06
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.2576580047607422e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.3053417205810547e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 3.6954879760742188e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 3.6954879760742188e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 1.150369644165039e-05
             }
         },
         "status": "success",
@@ -224,16 +1578,16 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "flashinfer": 1.676800012588501,
-            "vllm-fa": 3.8799359798431396,
-            "ra++": 3.952639937400818,
-            "ra": 5.8122241497039795,
-            "pat_baseline": 0.4039359986782074,
-            "pat_sota": 0.4044800102710724,
-            "FastTree": 0.477183997631073,
-            "fa": 5.848527908325195,
-            "DeFT": 0.6952320039272308,
-            "cascade": 1.1960320472717285
+            "flashinfer": 1.6885759830474854,
+            "vllm-fa": 3.8676319122314453,
+            "ra++": 3.968511939048767,
+            "ra": 5.767663955688477,
+            "pat_baseline": 0.4023839980363846,
+            "pat_sota": 0.40038400888442993,
+            "FastTree": 0.47513601183891296,
+            "fa": 5.803440093994141,
+            "DeFT": 0.69064000248909,
+            "cascade": 0.8642560243606567
         },
         "correctness": {
             "flashinfer": {
@@ -244,22 +1598,22 @@
             "ra++": {
                 "status": "PASSED",
                 "max_diff": 0.00390625,
-                "mean_diff": 5.4001808166503906e-05
+                "mean_diff": 5.418062210083008e-05
             },
             "ra": {
                 "status": "PASSED",
                 "max_diff": 0.00390625,
-                "mean_diff": 5.3942203521728516e-05
+                "mean_diff": 5.412101745605469e-05
             },
             "pat_baseline": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 5.9604644775390625e-06
+                "mean_diff": 5.900859832763672e-06
             },
             "pat_sota": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 6.616115570068359e-06
+                "mean_diff": 5.900859832763672e-06
             },
             "FastTree": {
                 "status": "PASSED",
@@ -268,8 +1622,8 @@
             },
             "DeFT": {
                 "status": "PASSED",
-                "max_diff": 0.000244140625,
-                "mean_diff": 1.627206802368164e-05
+                "max_diff": 0.00048828125,
+                "mean_diff": 1.633167266845703e-05
             }
         },
         "status": "success",
@@ -282,45 +1636,45 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "flashinfer": 0.8724480271339417,
-            "vllm-fa": 1.1893119812011719,
-            "ra++": 1.06496000289917,
-            "ra": 1.4412800073623657,
-            "pat_baseline": 0.1637599989771843,
+            "flashinfer": 0.8744959831237793,
+            "vllm-fa": 1.1975679993629456,
+            "ra++": 1.0659840106964111,
+            "ra": 1.4863359928131104,
+            "pat_baseline": 0.16993600130081177,
             "pat_sota": 0.16281600296497345,
-            "DeFT": 0.5002239942550659,
-            "cascade": 0.5625120103359222
+            "DeFT": 0.49612799286842346,
+            "cascade": 0.8314880132675171
         },
         "correctness": {
             "flashinfer": {
                 "status": "PASSED",
-                "max_diff": 0.001953125,
-                "mean_diff": 1.2218952178955078e-05
+                "max_diff": 0.0009765625,
+                "mean_diff": 1.2278556823730469e-05
             },
             "ra++": {
                 "status": "PASSED",
-                "max_diff": 0.001953125,
-                "mean_diff": 1.6450881958007812e-05
+                "max_diff": 0.00390625,
+                "mean_diff": 1.621246337890625e-05
             },
             "ra": {
                 "status": "PASSED",
-                "max_diff": 0.001953125,
-                "mean_diff": 1.6391277313232422e-05
+                "max_diff": 0.00390625,
+                "mean_diff": 1.615285873413086e-05
             },
             "pat_baseline": {
                 "status": "PASSED",
-                "max_diff": 0.00048828125,
+                "max_diff": 0.0009765625,
                 "mean_diff": 3.516674041748047e-06
             },
             "pat_sota": {
                 "status": "PASSED",
-                "max_diff": 0.001953125,
-                "mean_diff": 8.58306884765625e-06
+                "max_diff": 0.0009765625,
+                "mean_diff": 3.516674041748047e-06
             },
             "DeFT": {
                 "status": "PASSED",
                 "max_diff": 0.00048828125,
-                "mean_diff": 1.6450881958007812e-05
+                "mean_diff": 1.6391277313232422e-05
             }
         },
         "status": "success",
@@ -333,52 +1687,52 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "flashinfer": 0.9179359972476959,
-            "vllm-fa": 1.2113919854164124,
-            "ra++": 1.093616008758545,
-            "ra": 1.5129599571228027,
-            "pat_baseline": 0.22937600314617157,
-            "pat_sota": 0.2277280017733574,
-            "FastTree": 0.4106239974498749,
-            "fa": 1.5226880311965942,
-            "DeFT": 0.5509119927883148,
-            "cascade": 0.9144319891929626
+            "flashinfer": 0.9164479970932007,
+            "vllm-fa": 1.1233279705047607,
+            "ra++": 1.0853599905967712,
+            "ra": 1.5595519542694092,
+            "pat_baseline": 0.22118400037288666,
+            "pat_sota": 0.21913599967956543,
+            "FastTree": 0.37887999415397644,
+            "fa": 1.5020480155944824,
+            "DeFT": 0.5411840081214905,
+            "cascade": 1.604095995426178
         },
         "correctness": {
             "flashinfer": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 1.239776611328125e-05
+                "mean_diff": 1.2278556823730469e-05
             },
             "ra++": {
                 "status": "PASSED",
-                "max_diff": 0.001953125,
-                "mean_diff": 1.537799835205078e-05
+                "max_diff": 0.00390625,
+                "mean_diff": 1.5735626220703125e-05
             },
             "ra": {
                 "status": "PASSED",
-                "max_diff": 0.001953125,
-                "mean_diff": 1.531839370727539e-05
+                "max_diff": 0.00390625,
+                "mean_diff": 1.5735626220703125e-05
             },
             "pat_baseline": {
                 "status": "PASSED",
                 "max_diff": 0.0009765625,
-                "mean_diff": 3.6954879760742188e-06
+                "mean_diff": 3.635883331298828e-06
             },
             "pat_sota": {
                 "status": "PASSED",
                 "max_diff": 0.0009765625,
-                "mean_diff": 3.6954879760742188e-06
+                "mean_diff": 3.635883331298828e-06
             },
             "FastTree": {
                 "status": "PASSED",
-                "max_diff": 0.000244140625,
+                "max_diff": 0.00048828125,
                 "mean_diff": 1.1920928955078125e-05
             },
             "DeFT": {
                 "status": "PASSED",
-                "max_diff": 0.000244140625,
-                "mean_diff": 1.6391277313232422e-05
+                "max_diff": 0.00048828125,
+                "mean_diff": 1.633167266845703e-05
             }
         },
         "status": "success",
@@ -391,45 +1745,745 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "flashinfer": 0.9292799830436707,
-            "vllm-fa": 1.2216320037841797,
-            "ra++": 1.1125760078430176,
-            "ra": 1.497600018978119,
-            "pat_baseline": 0.33228799700737,
-            "pat_sota": 0.3256320059299469,
-            "DeFT": 2.563040018081665,
-            "cascade": 0.8155519962310791
+            "flashinfer": 0.897024005651474,
+            "vllm-fa": 1.2016640305519104,
+            "ra++": 1.1099520325660706,
+            "ra": 1.4713279604911804,
+            "pat_baseline": 0.3328000009059906,
+            "pat_sota": 0.32870399951934814,
+            "DeFT": 2.5635839700698853,
+            "cascade": 0.7889759838581085
         },
         "correctness": {
             "flashinfer": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 1.245737075805664e-05
+                "mean_diff": 1.233816146850586e-05
             },
             "ra++": {
                 "status": "PASSED",
-                "max_diff": 0.001953125,
-                "mean_diff": 1.4722347259521484e-05
+                "max_diff": 0.00390625,
+                "mean_diff": 1.5079975128173828e-05
             },
             "ra": {
                 "status": "PASSED",
-                "max_diff": 0.001953125,
-                "mean_diff": 1.4662742614746094e-05
+                "max_diff": 0.00390625,
+                "mean_diff": 1.5020370483398438e-05
             },
             "pat_baseline": {
                 "status": "PASSED",
-                "max_diff": 0.0009765625,
-                "mean_diff": 3.6954879760742188e-06
+                "max_diff": 0.001953125,
+                "mean_diff": 3.5762786865234375e-06
             },
             "pat_sota": {
                 "status": "PASSED",
-                "max_diff": 0.0009765625,
-                "mean_diff": 3.6954879760742188e-06
+                "max_diff": 0.001953125,
+                "mean_diff": 3.5762786865234375e-06
             },
             "DeFT": {
                 "status": "PASSED",
                 "max_diff": 0.00048828125,
+                "mean_diff": 1.627206802368164e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,4,16,512_1024,256,128,32",
+        "nheads_q": 32,
+        "nheads_kv": 32,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {},
+        "correctness": {},
+        "status": "failed",
+        "error": {
+            "type": "OutOfMemoryError",
+            "message": "CUDA out of memory. Tried to allocate 5.62 GiB. GPU 0 has a total capacity of 9.67 GiB of which 3.46 GiB is free. Process 2210273 has 6.20 GiB memory in use. Of the allocated memory 5.94 GiB is allocated by PyTorch, and 17.74 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)",
+            "traceback": "Traceback (most recent call last):\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 774, in run_benchmark\n    lats_std, corr_std = benchmark(\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 113, in benchmark\n    ) = generate_random_kv_cache(\n  File \"/usr/local/lib/python3.10/dist-packages/prefix_attn/utils.py\", line 36, in generate_random_kv_cache\n    v_cache = v_cache_paged[block_table]  # (batch_size, num_blocks, block_size, nheads_kv, head_dim)\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 5.62 GiB. GPU 0 has a total capacity of 9.67 GiB of which 3.46 GiB is free. Process 2210273 has 6.20 GiB memory in use. Of the allocated memory 5.94 GiB is allocated by PyTorch, and 17.74 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
+        }
+    },
+    {
+        "tree": "1,4,16,512_1024,256,128,32",
+        "nheads_q": 16,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 2.4401919841766357,
+            "vllm-fa": 4.561408042907715,
+            "ra++": 1.8334400057792664,
+            "ra": 2.4037280082702637,
+            "pat_baseline": 0.3189759999513626,
+            "pat_sota": 0.3123199939727783,
+            "DeFT": 0.92876797914505,
+            "cascade": 1.1360960006713867
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 7.808208465576172e-06
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 2.4020671844482422e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 2.4437904357910156e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 7.748603820800781e-07
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 7.748603820800781e-07
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.0001220703125,
+                "mean_diff": 1.0848045349121094e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,4,16,512_1024,256,128,32",
+        "nheads_q": 32,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 2.4330239295959473,
+            "vllm-fa": 4.5003838539123535,
+            "ra++": 1.9097599983215332,
+            "ra": 2.302367925643921,
+            "pat_baseline": 0.46430400013923645,
+            "pat_sota": 0.46430400013923645,
+            "FastTree": 0.6415199935436249,
+            "fa": 7.326096057891846,
+            "DeFT": 1.0622720122337341,
+            "cascade": 1.2282560467720032
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 8.106231689453125e-06
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.817941665649414e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.8596649169921875e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 7.748603820800781e-07
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 7.748603820800781e-07
+            },
+            "FastTree": {
+                "status": "PASSED",
+                "max_diff": 0.0001220703125,
+                "mean_diff": 8.761882781982422e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 1.0848045349121094e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,4,16,512_1024,256,128,32",
+        "nheads_q": 64,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 2.301408052444458,
+            "vllm-fa": 4.501456022262573,
+            "ra++": 2.1591039896011353,
+            "ra": 2.770400047302246,
+            "pat_baseline": 0.7776640057563782,
+            "pat_sota": 0.8534559905529022,
+            "DeFT": 6.220240116119385,
+            "cascade": 1.614848017692566
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 8.404254913330078e-06
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.3828277587890625e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.424551010131836e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 8.344650268554688e-07
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 8.344650268554688e-07
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 1.0848045349121094e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,4,16,64,256,1024_256,32,256,64,32,256",
+        "nheads_q": 32,
+        "nheads_kv": 32,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {},
+        "correctness": {},
+        "status": "failed",
+        "error": {
+            "type": "OutOfMemoryError",
+            "message": "CUDA out of memory. Tried to allocate 7.00 GiB. GPU 0 has a total capacity of 9.67 GiB of which 5.14 GiB is free. Process 2216300 has 4.52 GiB memory in use. Of the allocated memory 4.27 GiB is allocated by PyTorch, and 13.67 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)",
+            "traceback": "Traceback (most recent call last):\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 774, in run_benchmark\n    lats_std, corr_std = benchmark(\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 113, in benchmark\n    ) = generate_random_kv_cache(\n  File \"/usr/local/lib/python3.10/dist-packages/prefix_attn/utils.py\", line 35, in generate_random_kv_cache\n    k_cache = k_cache_paged[block_table]  # (batch_size, num_blocks, block_size, nheads_kv, head_dim)\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 7.00 GiB. GPU 0 has a total capacity of 9.67 GiB of which 5.14 GiB is free. Process 2216300 has 4.52 GiB memory in use. Of the allocated memory 4.27 GiB is allocated by PyTorch, and 13.67 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
+        }
+    },
+    {
+        "tree": "1,4,16,64,256,1024_256,32,256,64,32,256",
+        "nheads_q": 16,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 2.932736039161682,
+            "vllm-fa": 5.378047943115234,
+            "ra++": 4.343231916427612,
+            "ra": 6.895616054534912,
+            "pat_baseline": 2.1913440227508545,
+            "pat_sota": 2.2031360864639282,
+            "DeFT": 4.430287837982178,
+            "cascade": 2.1606080532073975
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.0371208190917969e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.2934207916259766e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.3709068298339844e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 6.556510925292969e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 6.556510925292969e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 1.3470649719238281e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,4,16,64,256,1024_256,32,256,64,32,256",
+        "nheads_q": 32,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 2.9976799488067627,
+            "vllm-fa": 5.387263774871826,
+            "ra++": 4.632575988769531,
+            "ra": 6.966271877288818,
+            "pat_baseline": 2.3756799697875977,
+            "pat_sota": 2.3782399892807007,
+            "FastTree": 2.1688159704208374,
+            "fa": 9.143248081207275,
+            "DeFT": 4.81276798248291,
+            "cascade": 2.3223999738693237
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.043081283569336e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.1980533599853516e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.2755393981933594e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 5.781650543212891e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 5.781650543212891e-06
+            },
+            "FastTree": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 1.0728836059570312e-05
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 1.3470649719238281e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,4,16,64,256,1024_256,32,256,64,32,256",
+        "nheads_q": 64,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 2.9214240312576294,
+            "vllm-fa": 5.3831682205200195,
+            "ra++": 4.5930562019348145,
+            "ra": 7.087551832199097,
+            "pat_baseline": 2.851199984550476,
+            "pat_sota": 2.835455894470215,
+            "DeFT": 38.83212852478027,
+            "cascade": 2.916864037513733
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.049041748046875e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.1205673217773438e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.1980533599853516e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 5.781650543212891e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 5.781650543212891e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 1.3470649719238281e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,16,32,64,128,1024_256,128,64,32,32,32",
+        "nheads_q": 32,
+        "nheads_kv": 32,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {},
+        "correctness": {},
+        "status": "failed",
+        "error": {
+            "type": "OutOfMemoryError",
+            "message": "CUDA out of memory. Tried to allocate 64.00 MiB. GPU 0 has a total capacity of 9.67 GiB of which 56.88 MiB is free. Process 2222130 has 9.61 GiB memory in use. Of the allocated memory 9.34 GiB is allocated by PyTorch, and 25.12 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)",
+            "traceback": "Traceback (most recent call last):\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 774, in run_benchmark\n    lats_std, corr_std = benchmark(\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 266, in benchmark\n    latencies[\"pat_baseline\"] = Timer(pat_baseline_func, n_repeats)\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 44, in Timer\n    func()\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 257, in pat_baseline_func\n    prefix_attn_with_kvcache(\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 64.00 MiB. GPU 0 has a total capacity of 9.67 GiB of which 56.88 MiB is free. Process 2222130 has 9.61 GiB memory in use. Of the allocated memory 9.34 GiB is allocated by PyTorch, and 25.12 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
+        }
+    },
+    {
+        "tree": "1,16,32,64,128,1024_256,128,64,32,32,32",
+        "nheads_q": 16,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 1.9747360348701477,
+            "vllm-fa": 3.7273600101470947,
+            "ra++": 2.5722720623016357,
+            "ra": 3.271679997444153,
+            "pat_baseline": 0.5109760165214539,
+            "pat_sota": 0.5073919892311096,
+            "DeFT": 1.3643519878387451,
+            "cascade": 1.3404160141944885
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.2636184692382812e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
                 "mean_diff": 1.6391277313232422e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.7464160919189453e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 6.616115570068359e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 6.616115570068359e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 1.6808509826660156e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,16,32,64,128,1024_256,128,64,32,32,32",
+        "nheads_q": 32,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 2.1109760999679565,
+            "vllm-fa": 3.865088105201721,
+            "ra++": 2.7636799812316895,
+            "ra": 3.372032046318054,
+            "pat_baseline": 0.6834880113601685,
+            "pat_sota": 0.7045120000839233,
+            "FastTree": 0.7167999744415283,
+            "fa": 5.6432318687438965,
+            "DeFT": 1.4908640384674072,
+            "cascade": 1.3127679824829102
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.2814998626708984e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.5020370483398438e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.615285873413086e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 5.245208740234375e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 5.245208740234375e-06
+            },
+            "FastTree": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 1.2993812561035156e-05
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 1.6808509826660156e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,16,32,64,128,1024_256,128,64,32,32,32",
+        "nheads_q": 64,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 1.7971199750900269,
+            "vllm-fa": 3.902975916862488,
+            "ra++": 2.96345591545105,
+            "ra": 3.480064034461975,
+            "pat_baseline": 1.004032015800476,
+            "pat_sota": 1.0373120307922363,
+            "DeFT": 8.92569637298584,
+            "cascade": 1.7315839529037476
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.2874603271484375e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.4185905456542969e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.52587890625e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.8477439880371094e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.8477439880371094e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 1.6808509826660156e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,16,32,64,256,1024_256,128,64,32,32,32",
+        "nheads_q": 32,
+        "nheads_kv": 32,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {},
+        "correctness": {},
+        "status": "failed",
+        "error": {
+            "type": "OutOfMemoryError",
+            "message": "CUDA out of memory. Tried to allocate 20.00 MiB. GPU 0 has a total capacity of 9.67 GiB of which 12.88 MiB is free. Process 2228448 has 9.65 GiB memory in use. Of the allocated memory 9.40 GiB is allocated by PyTorch, and 13.06 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)",
+            "traceback": "Traceback (most recent call last):\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 774, in run_benchmark\n    lats_std, corr_std = benchmark(\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 198, in benchmark\n    latencies[\"ra++\"] = Timer(ra_func, n_repeats)\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 44, in Timer\n    func()\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 190, in ra_func\n    _ = RelayAttentionPlus(\n  File \"/workspace/PAT/benchmark/RelayAttention.py\", line 124, in RelayAttentionPlus\n    out = relay_fusion(\n  File \"/workspace/PAT/benchmark/RelayAttention.py\", line 26, in relay_fusion\n    out = _relay_fuse_triton(out_sys, lse_sys, out_usr, lse_usr)\n  File \"/workspace/PAT/benchmark/RelayAttention.py\", line 34, in _relay_fuse_triton\n    out = torch.empty_like(out_sys)\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 20.00 MiB. GPU 0 has a total capacity of 9.67 GiB of which 12.88 MiB is free. Process 2228448 has 9.65 GiB memory in use. Of the allocated memory 9.40 GiB is allocated by PyTorch, and 13.06 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
+        }
+    },
+    {
+        "tree": "1,16,32,64,256,1024_256,128,64,32,32,32",
+        "nheads_q": 16,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 1.9123200178146362,
+            "vllm-fa": 3.8543360233306885,
+            "ra++": 2.6526719331741333,
+            "ra": 3.316655993461609,
+            "pat_baseline": 0.5262400209903717,
+            "pat_sota": 0.5288799703121185,
+            "DeFT": 1.408511996269226,
+            "cascade": 1.6675040125846863
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.2636184692382812e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.6450881958007812e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.7523765563964844e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 6.735324859619141e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 6.735324859619141e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 1.6868114471435547e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,16,32,64,256,1024_256,128,64,32,32,32",
+        "nheads_q": 32,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 2.067968010902405,
+            "vllm-fa": 3.9075520038604736,
+            "ra++": 2.752511978149414,
+            "ra": 3.3504639863967896,
+            "pat_baseline": 0.6896159946918488,
+            "pat_sota": 0.7065600156784058,
+            "FastTree": 0.7516160011291504,
+            "fa": 5.642240047454834,
+            "DeFT": 1.55075204372406,
+            "cascade": 1.349071979522705
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.2814998626708984e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.4960765838623047e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.6033649444580078e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 5.245208740234375e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 5.245208740234375e-06
+            },
+            "FastTree": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 1.3053417205810547e-05
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 1.6748905181884766e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,16,32,64,256,1024_256,128,64,32,32,32",
+        "nheads_q": 64,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 1.9374079704284668,
+            "vllm-fa": 3.9111679792404175,
+            "ra++": 2.9312000274658203,
+            "ra": 3.455488085746765,
+            "pat_baseline": 1.1197440028190613,
+            "pat_sota": 1.1816960573196411,
+            "DeFT": 9.418240070343018,
+            "cascade": 1.9937280416488647
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.2874603271484375e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.4007091522216797e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.5139579772949219e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 5.245208740234375e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 5.245208740234375e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 1.6808509826660156e-05
             }
         },
         "status": "success",
@@ -446,8 +2500,8 @@
         "status": "failed",
         "error": {
             "type": "OutOfMemoryError",
-            "message": "CUDA out of memory. Tried to allocate 4.50 GiB. GPU 0 has a total capacity of 9.67 GiB of which 4.25 GiB is free. Process 3678175 has 5.41 GiB memory in use. Of the allocated memory 5.15 GiB is allocated by PyTorch, and 13.79 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)",
-            "traceback": "Traceback (most recent call last):\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 774, in run_benchmark\n    lats_std, corr_std = benchmark(\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 113, in benchmark\n    ) = generate_random_kv_cache(\n  File \"/usr/local/lib/python3.10/dist-packages/prefix_attn/utils.py\", line 36, in generate_random_kv_cache\n    v_cache = v_cache_paged[block_table]  # (batch_size, num_blocks, block_size, nheads_kv, head_dim)\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 4.50 GiB. GPU 0 has a total capacity of 9.67 GiB of which 4.25 GiB is free. Process 3678175 has 5.41 GiB memory in use. Of the allocated memory 5.15 GiB is allocated by PyTorch, and 13.79 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
+            "message": "CUDA out of memory. Tried to allocate 4.50 GiB. GPU 0 has a total capacity of 9.67 GiB of which 4.25 GiB is free. Process 2234988 has 5.41 GiB memory in use. Of the allocated memory 5.15 GiB is allocated by PyTorch, and 13.79 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)",
+            "traceback": "Traceback (most recent call last):\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 774, in run_benchmark\n    lats_std, corr_std = benchmark(\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 113, in benchmark\n    ) = generate_random_kv_cache(\n  File \"/usr/local/lib/python3.10/dist-packages/prefix_attn/utils.py\", line 36, in generate_random_kv_cache\n    v_cache = v_cache_paged[block_table]  # (batch_size, num_blocks, block_size, nheads_kv, head_dim)\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 4.50 GiB. GPU 0 has a total capacity of 9.67 GiB of which 4.25 GiB is free. Process 2234988 has 5.41 GiB memory in use. Of the allocated memory 5.15 GiB is allocated by PyTorch, and 13.79 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
         }
     },
     {
@@ -457,14 +2511,14 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "flashinfer": 2.1857279539108276,
-            "vllm-fa": 3.9393279552459717,
-            "ra++": 2.566655993461609,
-            "ra": 3.6730880737304688,
-            "pat_baseline": 0.5130239725112915,
-            "pat_sota": 0.5089280009269714,
-            "DeFT": 1.385472059249878,
-            "cascade": 1.4981119632720947
+            "flashinfer": 1.9353600144386292,
+            "vllm-fa": 3.8804479837417603,
+            "ra++": 2.6803200244903564,
+            "ra": 3.6081440448760986,
+            "pat_baseline": 0.5160319805145264,
+            "pat_sota": 0.5181440114974976,
+            "DeFT": 1.3946880102157593,
+            "cascade": 1.364575982093811
         },
         "correctness": {
             "flashinfer": {
@@ -475,27 +2529,27 @@
             "ra++": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 1.621246337890625e-05
+                "mean_diff": 1.609325408935547e-05
             },
             "ra": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 1.722574234008789e-05
+                "mean_diff": 1.71661376953125e-05
             },
             "pat_baseline": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 6.616115570068359e-06
+                "mean_diff": 6.556510925292969e-06
             },
             "pat_sota": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 6.616115570068359e-06
+                "mean_diff": 6.556510925292969e-06
             },
             "DeFT": {
                 "status": "PASSED",
                 "max_diff": 0.000244140625,
-                "mean_diff": 1.633167266845703e-05
+                "mean_diff": 1.6391277313232422e-05
             }
         },
         "status": "success",
@@ -508,32 +2562,32 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "flashinfer": 2.043392062187195,
-            "vllm-fa": 3.865007996559143,
-            "ra++": 2.653183937072754,
-            "ra": 3.5287039279937744,
-            "pat_baseline": 0.6768640279769897,
-            "pat_sota": 0.6947839856147766,
-            "FastTree": 0.724480003118515,
-            "fa": 5.911423921585083,
-            "DeFT": 1.5216320157051086,
-            "cascade": 1.6147680282592773
+            "flashinfer": 1.9430399537086487,
+            "vllm-fa": 3.861504077911377,
+            "ra++": 2.6255359649658203,
+            "ra": 3.61625599861145,
+            "pat_baseline": 0.7141280174255371,
+            "pat_sota": 0.7121919989585876,
+            "FastTree": 0.7403519749641418,
+            "fa": 5.864400148391724,
+            "DeFT": 1.553920030593872,
+            "cascade": 1.5262719988822937
         },
         "correctness": {
             "flashinfer": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 1.245737075805664e-05
+                "mean_diff": 1.2516975402832031e-05
             },
             "ra++": {
                 "status": "PASSED",
-                "max_diff": 0.001953125,
-                "mean_diff": 1.4603137969970703e-05
+                "max_diff": 0.00390625,
+                "mean_diff": 1.4722347259521484e-05
             },
             "ra": {
                 "status": "PASSED",
-                "max_diff": 0.001953125,
-                "mean_diff": 1.5616416931152344e-05
+                "max_diff": 0.00390625,
+                "mean_diff": 1.5795230865478516e-05
             },
             "pat_baseline": {
                 "status": "PASSED",
@@ -548,12 +2602,12 @@
             "FastTree": {
                 "status": "PASSED",
                 "max_diff": 0.000244140625,
-                "mean_diff": 1.2755393981933594e-05
+                "mean_diff": 1.2814998626708984e-05
             },
             "DeFT": {
                 "status": "PASSED",
                 "max_diff": 0.00048828125,
-                "mean_diff": 1.633167266845703e-05
+                "mean_diff": 1.6391277313232422e-05
             }
         },
         "status": "success",
@@ -566,14 +2620,14 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "flashinfer": 2.0270079374313354,
-            "vllm-fa": 3.8706719875335693,
-            "ra++": 2.9455519914627075,
-            "ra": 3.7108958959579468,
-            "pat_baseline": 1.0680320262908936,
-            "pat_sota": 1.129472017288208,
-            "DeFT": 9.449392318725586,
-            "cascade": 1.8119679689407349
+            "flashinfer": 2.0305919647216797,
+            "vllm-fa": 3.9131840467453003,
+            "ra++": 2.841599941253662,
+            "ra": 3.7462719678878784,
+            "pat_baseline": 1.0588159561157227,
+            "pat_sota": 1.1268799901008606,
+            "DeFT": 9.445888042449951,
+            "cascade": 1.8232319951057434
         },
         "correctness": {
             "flashinfer": {
@@ -584,12 +2638,290 @@
             "ra++": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 1.3887882232666016e-05
+                "mean_diff": 1.3768672943115234e-05
             },
             "ra": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 1.4960765838623047e-05
+                "mean_diff": 1.4841556549072266e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 3.6954879760742188e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 3.6954879760742188e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 1.6391277313232422e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,8,16,32,64,256,1024_256,128,64,32,32,32,32",
+        "nheads_q": 32,
+        "nheads_kv": 32,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {},
+        "correctness": {},
+        "status": "failed",
+        "error": {
+            "type": "OutOfMemoryError",
+            "message": "CUDA out of memory. Tried to allocate 4.50 GiB. GPU 0 has a total capacity of 9.67 GiB of which 4.19 GiB is free. Process 2242776 has 5.47 GiB memory in use. Of the allocated memory 5.22 GiB is allocated by PyTorch, and 13.79 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)",
+            "traceback": "Traceback (most recent call last):\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 774, in run_benchmark\n    lats_std, corr_std = benchmark(\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 113, in benchmark\n    ) = generate_random_kv_cache(\n  File \"/usr/local/lib/python3.10/dist-packages/prefix_attn/utils.py\", line 36, in generate_random_kv_cache\n    v_cache = v_cache_paged[block_table]  # (batch_size, num_blocks, block_size, nheads_kv, head_dim)\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 4.50 GiB. GPU 0 has a total capacity of 9.67 GiB of which 4.19 GiB is free. Process 2242776 has 5.47 GiB memory in use. Of the allocated memory 5.22 GiB is allocated by PyTorch, and 13.79 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
+        }
+    },
+    {
+        "tree": "1,8,16,32,64,256,1024_256,128,64,32,32,32,32",
+        "nheads_q": 16,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 1.9650559425354004,
+            "vllm-fa": 3.90502393245697,
+            "ra++": 2.7212799787521362,
+            "ra": 3.6408320665359497,
+            "pat_baseline": 0.5381119847297668,
+            "pat_sota": 0.5416960120201111,
+            "DeFT": 1.426367998123169,
+            "cascade": 1.9676159620285034
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.233816146850586e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.6033649444580078e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.710653305053711e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 6.377696990966797e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 6.377696990966797e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 1.6391277313232422e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,8,16,32,64,256,1024_256,128,64,32,32,32,32",
+        "nheads_q": 32,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 2.1637120246887207,
+            "vllm-fa": 3.922432065010071,
+            "ra++": 2.372496008872986,
+            "ra": 3.6121599674224854,
+            "pat_baseline": 0.6895680129528046,
+            "pat_sota": 0.696256011724472,
+            "FastTree": 0.7607040107250214,
+            "fa": 5.899152040481567,
+            "DeFT": 1.583568036556244,
+            "cascade": 1.491424024105072
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.245737075805664e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.4781951904296875e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.5854835510253906e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 4.827976226806641e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 4.827976226806641e-06
+            },
+            "FastTree": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 1.2755393981933594e-05
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 1.6391277313232422e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "1,8,16,32,64,256,1024_256,128,64,32,32,32,32",
+        "nheads_q": 64,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 1.9983199834823608,
+            "vllm-fa": 3.9111679792404175,
+            "ra++": 2.5113279819488525,
+            "ra": 3.7237759828567505,
+            "pat_baseline": 1.1136000156402588,
+            "pat_sota": 1.1755520105361938,
+            "DeFT": 9.954815864562988,
+            "cascade": 1.9251199960708618
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.2576580047607422e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.3768672943115234e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.4781951904296875e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 4.827976226806641e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 4.827976226806641e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 1.633167266845703e-05
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "2,8,16,256_256,256,32,32",
+        "nheads_q": 32,
+        "nheads_kv": 32,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 1.6486400365829468,
+            "vllm-fa": 3.87174391746521,
+            "pat_baseline": 0.4131840020418167,
+            "pat_sota": 0.4106239974498749,
+            "fa": 6.087679862976074
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 5.245208740234375e-06
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 4.291534423828125e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 4.291534423828125e-06
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "2,8,16,256_256,256,32,32",
+        "nheads_q": 16,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 0.7608320116996765,
+            "vllm-fa": 1.168895959854126,
+            "pat_baseline": 0.17766399681568146,
+            "pat_sota": 0.17815999686717987
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 1.1861324310302734e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 4.470348358154297e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 4.470348358154297e-06
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "2,8,16,256_256,256,32,32",
+        "nheads_q": 32,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 0.8954880237579346,
+            "vllm-fa": 1.1980799436569214,
+            "pat_baseline": 0.2181120067834854,
+            "pat_sota": 0.21545600146055222,
+            "fa": 1.499135971069336
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.2218952178955078e-05
             },
             "pat_baseline": {
                 "status": "PASSED",
@@ -600,11 +2932,38 @@
                 "status": "PASSED",
                 "max_diff": 0.0009765625,
                 "mean_diff": 3.635883331298828e-06
-            },
-            "DeFT": {
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "2,8,16,256_256,256,32,32",
+        "nheads_q": 64,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 0.6912000179290771,
+            "vllm-fa": 1.1402239799499512,
+            "pat_baseline": 0.329584002494812,
+            "pat_sota": 0.32767999172210693
+        },
+        "correctness": {
+            "flashinfer": {
                 "status": "PASSED",
-                "max_diff": 0.00048828125,
-                "mean_diff": 1.633167266845703e-05
+                "max_diff": 0.001953125,
+                "mean_diff": 1.239776611328125e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 3.635883331298828e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 3.635883331298828e-06
             }
         },
         "status": "success",
@@ -617,17 +2976,17 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "flashinfer": 3.798527956008911,
-            "vllm-fa": 9.249728202819824,
-            "pat_baseline": 1.7632319927215576,
-            "pat_sota": 1.7786719799041748,
-            "fa": 14.808576107025146
+            "flashinfer": 3.8312960863113403,
+            "vllm-fa": 9.210880279541016,
+            "pat_baseline": 1.7663999795913696,
+            "pat_sota": 1.7694720029830933,
+            "fa": 14.654463768005371
         },
         "correctness": {
             "flashinfer": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 6.973743438720703e-06
+                "mean_diff": 7.033348083496094e-06
             },
             "pat_baseline": {
                 "status": "PASSED",
@@ -650,10 +3009,10 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "flashinfer": 1.37881600856781,
-            "vllm-fa": 2.4058879613876343,
-            "pat_baseline": 0.5591039955615997,
-            "pat_sota": 0.5550079941749573
+            "flashinfer": 1.3204480409622192,
+            "vllm-fa": 2.4237760305404663,
+            "pat_baseline": 0.5939199924468994,
+            "pat_sota": 0.5908480286598206
         },
         "correctness": {
             "flashinfer": {
@@ -664,12 +3023,12 @@
             "pat_baseline": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 6.556510925292969e-06
+                "mean_diff": 6.67572021484375e-06
             },
             "pat_sota": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 6.556510925292969e-06
+                "mean_diff": 6.67572021484375e-06
             }
         },
         "status": "success",
@@ -682,17 +3041,17 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "flashinfer": 1.521664023399353,
-            "vllm-fa": 2.386944055557251,
-            "pat_baseline": 0.6931679844856262,
-            "pat_sota": 0.6900800168514252,
-            "fa": 3.7774239778518677
+            "flashinfer": 1.4131200313568115,
+            "vllm-fa": 2.3956480026245117,
+            "pat_baseline": 0.6911680102348328,
+            "pat_sota": 0.6881279945373535,
+            "fa": 3.872159957885742
         },
         "correctness": {
             "flashinfer": {
                 "status": "PASSED",
                 "max_diff": 0.001953125,
-                "mean_diff": 1.1324882507324219e-05
+                "mean_diff": 1.138448715209961e-05
             },
             "pat_baseline": {
                 "status": "PASSED",
@@ -715,10 +3074,10 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "flashinfer": 1.4269440174102783,
-            "vllm-fa": 2.399151921272278,
-            "pat_baseline": 0.8616960048675537,
-            "pat_sota": 0.8944000005722046
+            "flashinfer": 1.270799994468689,
+            "vllm-fa": 2.4017919301986694,
+            "pat_baseline": 0.9318400025367737,
+            "pat_sota": 0.9277439713478088
         },
         "correctness": {
             "flashinfer": {
@@ -741,6 +3100,248 @@
         "error": null
     },
     {
+        "tree": "8,16,32,256_512,512,256,32",
+        "nheads_q": 32,
+        "nheads_kv": 32,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 3.5174400806427,
+            "vllm-fa": 8.416255950927734,
+            "pat_baseline": 0.8488960266113281,
+            "pat_sota": 0.8508319854736328,
+            "fa": 13.672927856445312
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 6.020069122314453e-06
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 5.543231964111328e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 5.543231964111328e-06
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "8,16,32,256_512,512,256,32",
+        "nheads_q": 16,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 1.5221760272979736,
+            "vllm-fa": 2.1565439701080322,
+            "pat_baseline": 0.30720001459121704,
+            "pat_sota": 0.3071040064096451
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 8.940696716308594e-06
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 6.377696990966797e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 6.377696990966797e-06
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "8,16,32,256_512,512,256,32",
+        "nheads_q": 32,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 1.265663981437683,
+            "vllm-fa": 2.1934080123901367,
+            "pat_baseline": 0.35072000324726105,
+            "pat_sota": 0.3291040062904358,
+            "fa": 3.67304003238678
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 8.881092071533203e-06
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 4.172325134277344e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 4.172325134277344e-06
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "8,16,32,256_512,512,256,32",
+        "nheads_q": 64,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 1.5861760377883911,
+            "vllm-fa": 2.187168002128601,
+            "pat_baseline": 0.44543999433517456,
+            "pat_sota": 0.4423680007457733
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 8.940696716308594e-06
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 8.940696716308594e-07
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 8.940696716308594e-07
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "256_1024",
+        "nheads_q": 32,
+        "nheads_kv": 32,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {},
+        "correctness": {},
+        "status": "failed",
+        "error": {
+            "type": "OutOfMemoryError",
+            "message": "CUDA out of memory. Tried to allocate 2.00 GiB. GPU 0 has a total capacity of 9.67 GiB of which 1.25 GiB is free. Process 2259326 has 8.41 GiB memory in use. Of the allocated memory 8.02 GiB is allocated by PyTorch, and 152.00 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)",
+            "traceback": "Traceback (most recent call last):\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 790, in run_benchmark\n    lats_ft, corr_ft = ft_benchmark(\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 326, in ft_benchmark\n    qkv_preparation(tree_info, nheads_q, nheads_kv, head_dim, device, dtype)\n  File \"/workspace/PAT/benchmark/FastTree.py\", line 455, in qkv_preparation\n    K_tree_tensor = torch.cat(K_tree_tensor, dim=1).reshape(\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 2.00 GiB. GPU 0 has a total capacity of 9.67 GiB of which 1.25 GiB is free. Process 2259326 has 8.41 GiB memory in use. Of the allocated memory 8.02 GiB is allocated by PyTorch, and 152.00 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
+        }
+    },
+    {
+        "tree": "256_1024",
+        "nheads_q": 16,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 1.6394239664077759,
+            "vllm-fa": 1.7505279779434204,
+            "pat_baseline": 1.6117759943008423,
+            "pat_sota": 1.6117759943008423
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 1.0013580322265625e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0,
+                "mean_diff": 0.0
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0,
+                "mean_diff": 0.0
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "256_1024",
+        "nheads_q": 32,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 1.655247986316681,
+            "vllm-fa": 1.7386720180511475,
+            "pat_baseline": 1.5630080103874207,
+            "pat_sota": 1.5605759620666504,
+            "fa": 2.9209600687026978
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 1.0013580322265625e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0,
+                "mean_diff": 0.0
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0,
+                "mean_diff": 0.0
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "256_1024",
+        "nheads_q": 64,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "flashinfer": 1.6614400148391724,
+            "vllm-fa": 1.7535359859466553,
+            "pat_baseline": 1.623039960861206,
+            "pat_sota": 1.6250879764556885
+        },
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 1.0013580322265625e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0,
+                "mean_diff": 0.0
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0,
+                "mean_diff": 0.0
+            }
+        },
+        "status": "success",
+        "error": null
+    },
+    {
         "tree": "256_4096",
         "nheads_q": 32,
         "nheads_kv": 32,
@@ -751,8 +3352,8 @@
         "status": "failed",
         "error": {
             "type": "OutOfMemoryError",
-            "message": "CUDA out of memory. Tried to allocate 8.00 GiB. GPU 0 has a total capacity of 9.67 GiB of which 1.43 GiB is free. Process 3681497 has 8.23 GiB memory in use. Of the allocated memory 8.00 GiB is allocated by PyTorch, and 18.00 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)",
-            "traceback": "Traceback (most recent call last):\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 774, in run_benchmark\n    lats_std, corr_std = benchmark(\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 113, in benchmark\n    ) = generate_random_kv_cache(\n  File \"/usr/local/lib/python3.10/dist-packages/prefix_attn/utils.py\", line 33, in generate_random_kv_cache\n    v_cache_paged = torch.randn(num_blocks, block_size, nheads_kv, head_dim, dtype=dtype, device=device)\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 8.00 GiB. GPU 0 has a total capacity of 9.67 GiB of which 1.43 GiB is free. Process 3681497 has 8.23 GiB memory in use. Of the allocated memory 8.00 GiB is allocated by PyTorch, and 18.00 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
+            "message": "CUDA out of memory. Tried to allocate 8.00 GiB. GPU 0 has a total capacity of 9.67 GiB of which 1.43 GiB is free. Process 2262257 has 8.23 GiB memory in use. Of the allocated memory 8.00 GiB is allocated by PyTorch, and 18.00 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)",
+            "traceback": "Traceback (most recent call last):\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 774, in run_benchmark\n    lats_std, corr_std = benchmark(\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 113, in benchmark\n    ) = generate_random_kv_cache(\n  File \"/usr/local/lib/python3.10/dist-packages/prefix_attn/utils.py\", line 33, in generate_random_kv_cache\n    v_cache_paged = torch.randn(num_blocks, block_size, nheads_kv, head_dim, dtype=dtype, device=device)\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 8.00 GiB. GPU 0 has a total capacity of 9.67 GiB of which 1.43 GiB is free. Process 2262257 has 8.23 GiB memory in use. Of the allocated memory 8.00 GiB is allocated by PyTorch, and 18.00 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
         }
     },
     {
@@ -762,16 +3363,16 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "flashinfer": 5.989887952804565,
-            "vllm-fa": 6.327807903289795,
-            "pat_baseline": 5.996464014053345,
-            "pat_sota": 5.959680080413818
+            "flashinfer": 5.965824127197266,
+            "vllm-fa": 6.313408136367798,
+            "pat_baseline": 5.992959976196289,
+            "pat_sota": 5.987839937210083
         },
         "correctness": {
             "flashinfer": {
                 "status": "PASSED",
-                "max_diff": 0.00048828125,
-                "mean_diff": 5.4836273193359375e-06
+                "max_diff": 0.0001220703125,
+                "mean_diff": 5.424022674560547e-06
             },
             "pat_baseline": {
                 "status": "PASSED",
@@ -780,8 +3381,8 @@
             },
             "pat_sota": {
                 "status": "PASSED",
-                "max_diff": 6.103515625e-05,
-                "mean_diff": 1.7881393432617188e-07
+                "max_diff": 0.0,
+                "mean_diff": 0.0
             }
         },
         "status": "success",
@@ -798,8 +3399,8 @@
         "status": "failed",
         "error": {
             "type": "OutOfMemoryError",
-            "message": "CUDA out of memory. Tried to allocate 2.00 GiB. GPU 0 has a total capacity of 9.67 GiB of which 1.25 GiB is free. Process 3682100 has 8.41 GiB memory in use. Of the allocated memory 8.02 GiB is allocated by PyTorch, and 152.00 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)",
-            "traceback": "Traceback (most recent call last):\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 790, in run_benchmark\n    lats_ft, corr_ft = ft_benchmark(\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 326, in ft_benchmark\n    qkv_preparation(tree_info, nheads_q, nheads_kv, head_dim, device, dtype)\n  File \"/workspace/PAT/benchmark/FastTree.py\", line 455, in qkv_preparation\n    K_tree_tensor = torch.cat(K_tree_tensor, dim=1).reshape(\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 2.00 GiB. GPU 0 has a total capacity of 9.67 GiB of which 1.25 GiB is free. Process 3682100 has 8.41 GiB memory in use. Of the allocated memory 8.02 GiB is allocated by PyTorch, and 152.00 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
+            "message": "CUDA out of memory. Tried to allocate 2.00 GiB. GPU 0 has a total capacity of 9.67 GiB of which 1.25 GiB is free. Process 2263341 has 8.41 GiB memory in use. Of the allocated memory 8.02 GiB is allocated by PyTorch, and 152.00 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)",
+            "traceback": "Traceback (most recent call last):\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 790, in run_benchmark\n    lats_ft, corr_ft = ft_benchmark(\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 326, in ft_benchmark\n    qkv_preparation(tree_info, nheads_q, nheads_kv, head_dim, device, dtype)\n  File \"/workspace/PAT/benchmark/FastTree.py\", line 455, in qkv_preparation\n    K_tree_tensor = torch.cat(K_tree_tensor, dim=1).reshape(\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 2.00 GiB. GPU 0 has a total capacity of 9.67 GiB of which 1.25 GiB is free. Process 2263341 has 8.41 GiB memory in use. Of the allocated memory 8.02 GiB is allocated by PyTorch, and 152.00 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
         }
     },
     {
@@ -809,10 +3410,10 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "flashinfer": 6.023168087005615,
-            "vllm-fa": 6.363647937774658,
-            "pat_baseline": 6.022079944610596,
-            "pat_sota": 6.0174720287323
+            "flashinfer": 6.0298240184783936,
+            "vllm-fa": 6.317056179046631,
+            "pat_baseline": 6.024191856384277,
+            "pat_sota": 6.030335903167725
         },
         "correctness": {
             "flashinfer": {
@@ -827,8 +3428,8 @@
             },
             "pat_sota": {
                 "status": "PASSED",
-                "max_diff": 6.103515625e-05,
-                "mean_diff": 1.7881393432617188e-07
+                "max_diff": 0.0,
+                "mean_diff": 0.0
             }
         },
         "status": "success",

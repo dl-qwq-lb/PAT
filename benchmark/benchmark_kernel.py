@@ -270,7 +270,7 @@ def benchmark(
         # 2) SOTA 调度：use_sota = True，使用 SM 数量 × 系数 作为 CTA 上限
         tree_sota = PrefixTreeCPP(block_size)
         tree_sota.build_radix_tree(seq_lens, table)
-        max_cta = get_sm_count(device) * 4 if get_sm_count(device) is not None else -1
+        max_cta = get_sm_count(device) * 3 if get_sm_count(device) is not None else -1
         tree_sota.pack_schedule(MNWs, nheads_q // nheads_kv, nheads_kv, True, max_cta)
         tree_sota.kernel_info.to_gpu(torch.device(device))
 
