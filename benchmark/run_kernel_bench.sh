@@ -4,24 +4,24 @@ export TORCH_CUDA_ARCH_LIST="8.0 9.0"
 
 TREES=(
     "1,10_4096,416"
-    # "1,256_256,32"
-    # "1,1024_2048,32"
-    # "1,2,64_1024,256,256"
-    # "1,4,256_32,256,32"
-    # "1,8,512_32,512,256"
-    # "1,8,512_32,2048,256"
-    # "1,8,512_512,512,256"
+    "1,256_256,32"
+    "1,1024_2048,32"
+    "1,2,64_1024,256,256"
+    "1,4,256_32,256,32"
+    "1,8,512_32,512,256"
+    "1,8,512_32,2048,256"
+    "1,8,512_512,512,256"
     "1,4,8,256_32,256,256,32"
-    # "1,4,16,512_1024,256,128,32"
-    # "1,4,16,64,256,1024_256,32,256,64,32,256"
-    # "1,16,32,64,128,1024_256,128,64,32,32,32"
-    # "1,16,32,64,256,1024_256,128,64,32,32,32"
+    "1,4,16,512_1024,256,128,32"
+    "1,4,16,64,256,1024_256,32,256,64,32,256"
+    "1,16,32,64,128,1024_256,128,64,32,32,32"
+    "1,16,32,64,256,1024_256,128,64,32,32,32"
     "1,8,16,32,64,128,1024_256,128,64,32,32,32,32"
-    # "1,8,16,32,64,256,1024_256,128,64,32,32,32,32"
-    # "2,8,16,256_256,256,32,32"
+    "1,8,16,32,64,256,1024_256,128,64,32,32,32,32"
+    "2,8,16,256_256,256,32,32"
     "4,16,256,512_512,32,128,32"
-    # "8,16,32,256_512,512,256,32"
-    # "256_1024"
+    "8,16,32,256_512,512,256,32"
+    "256_1024"
     "256_4096"
 )
 
@@ -34,9 +34,11 @@ HEAD_CONFIGS=(
 
 OUTPUT_FILE="kernel_perf.json"
 SCHEDULE_OUTPUT_FILE="schedule_perf.json"
+SCHEDULE_LOG_FILE="schedule.log"
 
-# rm -f $OUTPUT_FILE
+rm -f $OUTPUT_FILE
 rm -f $SCHEDULE_OUTPUT_FILE
+rm -f $SCHEDULE_LOG_FILE
 
 # --- progress bar helpers ---
 progress_bar () {
@@ -72,7 +74,7 @@ for tree in "${TREES[@]}"; do
 
     rm -rf ~/.cache/flashinfer
     read -r hq hkv <<< "$config"
-    # python benchmark_kernel.py --tree "$tree" --nheads_q "$hq" --nheads_kv "$hkv" --output_file "$OUTPUT_FILE" > kernel.log 2>&1
+    python benchmark_kernel.py --tree "$tree" --nheads_q "$hq" --nheads_kv "$hkv" --output_file "$OUTPUT_FILE" > kernel.log 2>&1
 
     # Run schedule test for this tree and config
     python ./schedule_test.py --tree "$tree" --nheads_q "$hq" --nheads_kv "$hkv" --block_size 32 --output_file "$SCHEDULE_OUTPUT_FILE" >> schedule.log 2>&1

@@ -216,17 +216,14 @@ def run_single_test_cpp_compare(name: str,
 
     time_base = measure_performance(run_baseline)
     ki_base = run_baseline()
-    
-    sm = get_sm_count()
-    if sm:
-        max_cta = sm * 4 
 
     # 测量 SOTA 性能
     def run_sota():
         tree = PrefixTreeCPP(block_size)
         padded_tensor = pad_block_table(block_table)
         tree.build_radix_tree(seq_lens, padded_tensor)
-        tree.pack_schedule_sota(MNWs, HRatio, kvHead, max_cta)
+        # max_cta 由 C++ balancePackSota 内部基于 SM 数自动推断
+        tree.pack_schedule_sota(MNWs, HRatio, kvHead, -1)
         return tree.kernel_info
 
     time_sota = measure_performance(run_sota)
