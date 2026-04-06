@@ -68,13 +68,12 @@ def run_cpp_schedule_sota(seq_lens: List[int],
                           block_size: int,
                           HRatio: int = 1,
                           kvHead: int = 8,
-                          MNWs=None,
-                          max_cta: int = -1):
+                          MNWs=None):
 
     padded_tensor = pad_block_table(block_table)          # CPU int32 Tensor
     tree = PrefixTreeCPP(block_size)
     tree.build_radix_tree(seq_lens, padded_tensor)        # 建基数树
-    tree.pack_schedule_sota(MNWs, HRatio, kvHead, max_cta)  # 使用 SOTA 调度链路
+    tree.pack_schedule_sota(MNWs, HRatio, kvHead)  # 使用 SOTA 调度链路
     return tree, tree.kernel_info
 
 def print_cpp_kernel_info(ki, label: str = "C++ kernel_info"):  
@@ -222,8 +221,7 @@ def run_single_test_cpp_compare(name: str,
         tree = PrefixTreeCPP(block_size)
         padded_tensor = pad_block_table(block_table)
         tree.build_radix_tree(seq_lens, padded_tensor)
-        # max_cta 由 C++ balancePackSota 内部基于 SM 数自动推断
-        tree.pack_schedule_sota(MNWs, HRatio, kvHead, -1)
+        tree.pack_schedule_sota(MNWs, HRatio, kvHead)
         return tree.kernel_info
 
     time_sota = measure_performance(run_sota)

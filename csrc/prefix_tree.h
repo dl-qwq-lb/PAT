@@ -8,6 +8,7 @@
 #include <cmath>
 #include <fstream>
 #include <cstdlib>
+#include <climits>
 
 #include <cuda_runtime_api.h>
 
@@ -192,8 +193,7 @@ public:
     void pack_schedule(std::optional<std::vector<std::vector<int>>> MNWs,
                        int HRatio = 1,
                        int kvHead = 8,
-                       bool use_sota = false,
-                       int max_cta = -1) {
+                       bool use_sota = false) {
 
         std::vector<std::vector<int>> buckets;
         if (!MNWs.has_value() || MNWs->empty()) {
@@ -227,7 +227,7 @@ public:
 
         // Balance Pack
         if (use_sota) {
-            packed_boxes = balancePackSota(packed_boxes, kvHead, HRatio, max_cta);
+            packed_boxes = balancePackSota(std::move(packed_boxes), kvHead, HRatio);
         } else {
             packed_boxes = balancePack(packed_boxes, kvHead, HRatio);
         }
@@ -339,9 +339,8 @@ public:
 
     void pack_schedule_sota(std::optional<std::vector<std::vector<int>>> MNWs,
                              int HRatio = 1,
-                             int kvHead = 8,
-                             int max_cta = -1) {
-        pack_schedule(MNWs, HRatio, kvHead, true, max_cta);
+                             int kvHead = 8) {
+        pack_schedule(MNWs, HRatio, kvHead, true);
     }
 
 private:
@@ -642,10 +641,9 @@ private:
         return cropPack;
     }
 
-    std::vector<PackedBox> balancePackSota(const std::vector<PackedBox>& boxes,
+    std::vector<PackedBox> balancePackSota(std::vector<PackedBox> boxes,
                                            int kvHead,
-                                           int HRatio = 1,
-                                           int max_cta = -1) {
+                                           int HRatio = 1) {
         using Clock = std::chrono::steady_clock;
 
         const bool enable_debug = (std::getenv("PAT_DEBUG_IMBALANCE") != nullptr);
@@ -658,7 +656,8 @@ private:
         if (boxes.empty()) return {};
 
         // 1) 直接以 _tree_heuristics 的输出作为初始 crop
-        std::vector<PackedBox> crop = boxes;
+        // NOTE: 使用 move 语义避免深拷贝（PackedBox 内含 q_table 向量），否则大 batch 下 schedule 开销会显著放大。
+        std::vector<PackedBox> crop = std::move(boxes);
         if (crop.empty()) return crop;
 
         const int base_cta = (int)crop.size();
@@ -671,10 +670,9 @@ private:
         else if (kvHead <= 32) threshold_cnt = 6;
         else                   threshold_cnt = 4;
 
-        // 允许的最大 CTA 数：在 baseline 基础上做温和放宽，避免过度碎片化
-        
-        int max_extra = std::min(base_cta, threshold_cnt);
-        int CTA_target = std::min(base_cta * 2, base_cta + max_extra);
+        // threshold_cnt 在此处作为“CTA 上限阈值”的参考值。
+        // 按你的要求：不再引入额外的 CTA 预算变量。
+        const int cta_limit = threshold_cnt;
 
         auto infer_max_cta_from_sm = [&]() -> int {
             static int cached_device = -1;
@@ -692,95 +690,20 @@ private:
                 return -1;
             }
             cached_device = dev;
-            cached_max_cta = std::max(1, prop.multiProcessorCount * 2);
+            cached_max_cta = std::max(1, prop.multiProcessorCount);
             return cached_max_cta;
         };
 
-        if (max_cta <= 0) {
-            int inferred = infer_max_cta_from_sm();
-            if (inferred > 0) max_cta = inferred;
-        }
-        if (max_cta > 0) {
-            CTA_target = std::min(CTA_target, max_cta);
-        }
+        const int cta_cap = infer_max_cta_from_sm();
+        // NOTE: 当前 SOTA 已采用 baseline 的 threshold 语义（cta_limit=threshold_cnt）。
+        // 若在此处用 SM 数量对 cta_limit 向下截断，会导致 cta_limit<=base_cta
+        // 直接退化为“不拆分”，出现你在 schedule.log 里看到的“分割不足”。
+        // 因此这里保留 cta_cap 仅用于日志/调试，不再对 cta_limit 做向下截断。
 
         auto t_init_end = Clock::now();
 
-        // 关键路径：当 CTA_target <= base_cta 时，不存在任何可用的拆分预算。
-        if (CTA_target <= base_cta) {
-            auto t_total_end = Clock::now();
-            if (enable_schedule_log) {
-                auto stage_init_us = std::chrono::duration_cast<std::chrono::microseconds>(t_init_end - t_total_begin).count();
-                auto total_us = std::chrono::duration_cast<std::chrono::microseconds>(t_total_end - t_total_begin).count();
-                std::ofstream ofs(schedule_log_path, std::ios::app);
-                if (ofs) {
-                    ofs << "balancePackSota kvHead=" << kvHead
-                        << " HRatio=" << HRatio
-                        << " base_cta=" << base_cta
-                        << " CTA_target=" << CTA_target
-                        << " max_cta=" << max_cta
-                        << " total_kv=0"
-                        << " target_kv=0"
-                        << " stage_init_us=" << stage_init_us
-                        << " stage_cost_us=0"
-                        << " stage_split_us=0"
-                        << " total_us=" << total_us
-                        << "\n";
-                }
-            }
-            return crop;
-        }
-
-        // 粗略模型：
-        // - 每个 CTA 需要读一次 Q：q_cost ~= num_seqs * HRatio
-        // - 每个 token 需要读 K+V：kv_cost ~= 2 * kv_in_CTA
-        auto q_cost = [&](const PackedBox& b) -> double {
-            return (double)std::max(1, (int)b.q_table.size()) * (double)std::max(1, HRatio);
-        };
-
-        auto compute_cost = [&](const PackedBox& b) -> double {
-            const double kv_tokens = (double)std::max(1, b.kv_in_CTA);
-            return 0.1 * q_cost(b) + kv_tokens + q_cost(b) * kv_tokens / std::max(1, HRatio);
-        };
-
-        long long total_kv = 0;
-        double total_q = 0.0;
-        for (const auto& b : crop) {
-            total_kv += (long long)std::max(0, b.kv_in_CTA);
-            total_q += q_cost(b);
-        }
-        const double total_cost = total_q + 2.0 * (double)std::max(0LL, total_kv);
-        const double avg_cost = total_cost / (double)CTA_target;
-
-        // 6.3: 阈值切分：保留 FlashInfer 风格的平均 KV chunk 大小作为辅助观测指标
-        const int target_kv = std::max(1, (int)std::ceil((double)std::max(1LL, total_kv) / (double)CTA_target));
-
-        if (enable_debug) {
-            double global_max_cost = 0.0;
-            double global_sum_cost = 0.0;
-            for (const auto& b : crop) {
-                double c = compute_cost(b);
-                global_sum_cost += c;
-                if (c > global_max_cost) global_max_cost = c;
-            }
-            double global_avg_cost = crop.empty() ? 0.0 : (global_sum_cost / (double)crop.size());
-            double imbalance_ratio = (global_avg_cost > 0.0) ? (global_max_cost / global_avg_cost) : 1.0;
-            std::cout << "[balancePackSota] kvHead=" << kvHead
-                      << ", HRatio=" << HRatio
-                      << ", base_cta=" << base_cta
-                      << ", CTA_target=" << CTA_target
-                      << ", max_cta=" << max_cta
-                      << ", total_kv=" << total_kv
-                      << ", target_kv=" << target_kv
-                      << ", total_cost=" << total_cost
-                      << ", avg_cost=" << avg_cost
-                      << ", c_max=" << global_max_cost
-                      << ", c_avg=" << global_avg_cost
-                      << ", ratio=" << imbalance_ratio
-                      << std::endl;
-        }
-
-        auto t_cost_end = Clock::now();
+        int cur_max_split = 0;
+        for (int v : split_per_seq) if (v > cur_max_split) cur_max_split = v;
 
         auto split_box_even_blocks = [&](PackedBox& src, int split_k, std::vector<PackedBox>& out) {
             if (!src.block_table_ptr) {
@@ -813,20 +736,18 @@ private:
                             src.block_table_ptr->begin() + end);
                 sub.block_table_ptr = vec;
 
-
                 int offset_tokens    = start * block_size;
                 int chunk_cap_tokens = (end - start) * block_size;
                 int remain_tokens    = src.kv_in_CTA - offset_tokens;
                 sub.kv_in_CTA        = std::max(0, std::min(remain_tokens, chunk_cap_tokens));
 
                 if (i == 0) {
-                    // 第一段沿用原 CTA_rank
                     sub.CTA_rank = src.CTA_rank;
                 } else if (!sub.q_table.empty()) {
-                    // 后续段按 baseline 规则为每条 seq 增加一个新的 rank
                     sub.CTA_rank = split_per_seq[sub.q_table[0]];
                     for (int qid : sub.q_table) {
                         split_per_seq[qid]++;
+                        if (split_per_seq[qid] > cur_max_split) cur_max_split = split_per_seq[qid];
                     }
                 }
 
@@ -836,39 +757,211 @@ private:
             }
         };
 
-        auto get_max_split = [&]() {
-            int m = 0;
-            for (int v : split_per_seq) if (v > m) m = v;
-            return m;
-        };
+        // 关键路径：当 CTA 数已达到/超过阈值时，不存在“L_kv 阶段的拆分预算”。
+        // 在这里按你的要求追加处理：
+        // - 度量不均衡
+        // - 若存在过长 chunk，则用成本模型做“k 平均削减”（每个过长 chunk 仅做一次）
+        // - 不要求严格把 CTA 限制在阈值以内（因此可能增加 CTA 数）
+        if (base_cta >= cta_limit) {
+            // 成本模型：a*q + b*kv + c*q*kv/HRatio
+            // 固定系数避免新增超参；b=2 延续 q:kv=1:2 直觉。
+            constexpr double cost_a = 0.1;
+            constexpr double cost_b = 1.0;
+            // constexpr double cost_c = 2.0;
 
-        std::vector<PackedBox> out;
-        out.reserve((size_t)CTA_target);
+            // 最多均分成 n 份（保持与当前实现一致的上限 8）
+            const int max_split_n = 8;
+            const int min_blocks_per_piece = 4;
 
-        int used_cta = 0;
-        for (int i = 0; i < (int)crop.size(); ++i) {
-            PackedBox b = std::move(crop[i]);
-            int boxes_left = (int)crop.size() - i;
-            int cta_left = CTA_target - used_cta;
-            if (cta_left <= 0) break;
+            int batch_min_kv = INT_MAX;
+            for (const auto& b : crop) {
+                int kv = std::max(0, b.kv_in_CTA);
+                if (kv > 0 && kv < batch_min_kv) batch_min_kv = kv;
+            }
+            if (batch_min_kv == INT_MAX) batch_min_kv = 1;
+            const int min_kv_tokens_per_piece = std::max(min_blocks_per_piece * block_size, batch_min_kv);
 
-            // 为后续每个 box 至少预留 1 个 CTA
-            int max_for_this = std::max(1, cta_left - (boxes_left - 1));
+            auto cost_fn = [&](int q_tokens, int kv_tokens) -> double {
+                int TS = 16;
+                const double padded_Q = TS - ((q_tokens - 1) % TS + 1);
+                const double qv = (padded_Q * (double)kv_tokens);
+                return cost_a * (double)q_tokens + cost_b * qv;
+            };
 
-            int desired = 1;
-            {
-                const double qc = q_cost(b);
-                const double kv_tokens = (double)std::max(0, b.kv_in_CTA);
-                const double kvc = 2.0 * kv_tokens;
+            auto ceil_div_int = [&](int a, int b) -> int {
+                if (b <= 0) return 0;
+                return (a + b - 1) / b;
+            };
 
-                // 目标：让每个 split 后的 piece 的 cost 约接近 avg_cost。
-                // piece_cost(k) ~= qc + kvc / k。
-                if (avg_cost > qc) {
-                    desired = (int)std::ceil(kvc / (avg_cost - qc));
-                    if (desired < 1) desired = 1;
-                } else {
-                    desired = 1;
+            // 不均衡度量（基于当前 crop 的 per-CTA cost）
+            double sum_cost = 0.0;
+            double max_cost = 0.0;
+            for (const auto& b : crop) {
+                const int q = std::max(0, (int)b.q_table.size());
+                const int kv = std::max(0, b.kv_in_CTA);
+                const double cst = cost_fn(q, kv);
+                sum_cost += cst;
+                if (cst > max_cost) max_cost = cst;
+            }
+            const double avg_cost = (crop.empty() ? 0.0 : (sum_cost / (double)crop.size()));
+            const double imbalance = (avg_cost > 0.0 ? (max_cost / avg_cost) : 0.0);
+
+            if (enable_debug) {
+                std::cout << "[balancePackSota@cap] kvHead=" << kvHead
+                          << " HRatio=" << HRatio
+                          << " base_cta=" << base_cta
+                          << " cta_limit=" << cta_limit
+                          << " max/avg=" << imbalance
+                          << " max_cost=" << max_cost
+                          << " avg_cost=" << avg_cost
+                          << std::endl;
+            }
+
+            std::vector<int> split_plan(crop.size(), 1);
+            for (size_t i = 0; i < crop.size(); ++i) {
+                const auto& b = crop[i];
+                const int q = std::max(0, (int)b.q_table.size());
+                const int kv = std::max(0, b.kv_in_CTA);
+                const double old_cost = cost_fn(q, kv);
+                if (!(avg_cost > 0.0) || old_cost <= 1.2 * avg_cost) continue;
+
+                // split_per_seq 上限约束：每条 seq 最多 32
+                int max_by_seq = 1;
+                if (!b.q_table.empty() && cur_max_split < 32) {
+                    int add_lim = INT_MAX;
+                    for (int qid : b.q_table) {
+                        if (qid < 0 || qid >= (int)split_per_seq.size()) continue;
+                        add_lim = std::min(add_lim, 32 - split_per_seq[qid]);
+                    }
+                    if (add_lim == INT_MAX) add_lim = 0;
+                    if (add_lim < 0) add_lim = 0;
+                    max_by_seq = 1 + add_lim;
                 }
+
+                int blocks = 0;
+                if (b.block_table_ptr) blocks = std::max(0, (int)b.block_table_ptr->size());
+                int max_by_blocks = (blocks > 0 ? std::max(1, blocks) : 1);
+
+                int max_k = std::min({max_split_n, max_by_blocks, max_by_seq});
+                if (max_k <= 1) continue;
+
+                // tail 约束：每段至少 min_blocks / min_kv
+                auto can_split_k = [&](int k) -> bool {
+                    if (k <= 1) return true;
+                    if (blocks > 0 && (blocks + k - 1) / k < min_blocks_per_piece) return false;
+                    if ((kv + k - 1) / k < min_kv_tokens_per_piece) return false;
+                    return true;
+                };
+
+                // 在 [2, max_k] 中选择收益最大的 k（每个过长 chunk 只执行一次）
+                int best_k = 1;
+                double best_net_gain = 0.0;
+                double best_new_cost = old_cost;
+
+                for (int k = 2; k <= max_k; ++k) {
+                    if (!can_split_k(k)) continue;
+                    const int kv_piece = ceil_div_int(kv, k);
+                    const double new_cost = cost_fn(q, kv_piece);
+                    const double benefit = old_cost - new_cost;
+                    if (benefit <= 0.0) continue;
+
+                    // 拆分开销：新增 (k-1) 个 CTA 带来的固定 q 侧开销（用 a*q 近似）
+                    const double overhead = (double)(k - 1) * (cost_a * (double)q);
+
+                    // 门槛：只有当 “benefit > 1.2 * overhead” 才允许拆
+                    const double net_gain = benefit - overhead;
+                    if (net_gain > best_net_gain) {
+                        best_net_gain = net_gain;
+                        best_k = k;
+                        best_new_cost = new_cost;
+                    }
+                }
+
+                if (best_k > 1 && best_net_gain > 0.0) {
+                    split_plan[i] = best_k;
+                    if (enable_debug) {
+                        std::cout << "[balancePackSota@cap] split idx=" << i
+                                  << " q=" << q
+                                  << " kv=" << kv
+                                  << " old_cost=" << old_cost
+                                  << " best_k=" << best_k
+                                  << " new_cost~=" << best_new_cost
+                                  << " net_gain=" << best_net_gain
+                                  << std::endl;
+                    }
+                }
+            }
+
+            bool any_split = false;
+            for (int k : split_plan) if (k > 1) { any_split = true; break; }
+            if (!any_split) {
+                if (enable_debug) {
+                    std::cout << "[balancePackSota@cap] no eligible split (gain <= 120% overhead)" << std::endl;
+                }
+                return crop;
+            }
+
+            std::vector<PackedBox> out;
+            out.reserve(crop.size() * 2);
+            for (size_t i = 0; i < crop.size(); ++i) {
+                PackedBox b = std::move(crop[i]);
+                split_box_even_blocks(b, split_plan[i], out);
+            }
+            return out;
+        }
+        // 暂时取消 cost 函数机制在“分割”中的应用：
+        // 恢复全局 L_kv 模式：
+        //   L_kv = ceil(sum(tile.kv_len) / cta_limit)
+        // 其中 tile 等价于 _tree_heuristics 输出的 PackedBox（已经按 query tile 粒度展开）。
+        long long total_kv_all = 0;
+        int batch_min_kv = INT_MAX;
+        for (const auto& b : crop) {
+            const int kv = std::max(0, b.kv_in_CTA);
+            total_kv_all += (long long)kv;
+            if (kv > 0 && kv < batch_min_kv) batch_min_kv = kv;
+        }
+        if (batch_min_kv == INT_MAX) batch_min_kv = 1;
+
+        if (total_kv_all <= 0) {
+            return crop;
+        }
+
+        const int global_L_kv = std::max(1, (int)std::ceil((double)std::max(1LL, total_kv_all) / (double)cta_limit));
+        // 不切出比当前 batch 已存在的最小片段更短的新片段（避免 schedule 侧碎片化纯开销）。
+        const int effective_L_kv = std::max(global_L_kv, batch_min_kv);
+
+        // if (enable_debug) {
+        //     std::cout << "[balancePackSota] kvHead=" << kvHead
+        //               << ", HRatio=" << HRatio
+        //               << ", base_cta=" << base_cta
+        //               << ", cta_limit=" << cta_limit
+        //               << ", cta_cap=" << cta_cap
+        //               << ", total_kv=" << total_kv_all
+        //               << ", global_L_kv=" << global_L_kv
+        //               << ", effective_L_kv=" << effective_L_kv
+        //               << std::endl;
+        // }
+
+        // auto t_cost_end = Clock::now();
+
+        // 预算分配（你提到的“CTA 不够时平均/按比例分割”）：
+        // 1) 先用 L_kv 计算每个 box 的 desired_i = ceil(kv_i / L_kv)
+        // 2) 若 sum(desired_i) > cta_limit，则把“额外 split 预算”按 need_i 比例缩放回退。
+        const int extra_budget_total = cta_limit - base_cta;
+        if (extra_budget_total <= 0) {
+            return crop;
+        }
+
+        const int max_splits_per_box = 8;
+        std::vector<int> desired(crop.size(), 1);
+        std::vector<int> need(crop.size(), 0);
+        long long sum_need = 0;
+        for (size_t i = 0; i < crop.size(); ++i) {
+            const auto& b = crop[i];
+            if (cur_max_split >= 32) {
+                desired[i] = 1;
+                need[i] = 0;
+                continue;
             }
 
             int max_by_blocks = 1;
@@ -876,43 +969,108 @@ private:
                 max_by_blocks = std::max(1, (int)b.block_table_ptr->size());
             }
 
-            int split_k = std::min(desired, std::min(max_for_this, max_by_blocks));
+            int d = ceil_div(std::max(0, b.kv_in_CTA), effective_L_kv);
+            if (d < 1) d = 1;
+            d = std::min(d, max_by_blocks);
+            d = std::min(d, max_splits_per_box);
+            desired[i] = d;
+            need[i] = std::max(0, d - 1);
+            sum_need += (long long)need[i];
+        }
+
+        if (sum_need <= 0) {
+            return crop;
+        }
+
+        std::vector<int> extra_alloc(crop.size(), 0);
+        if (sum_need <= (long long)extra_budget_total) {
+            for (size_t i = 0; i < crop.size(); ++i) extra_alloc[i] = need[i];
+        } else {
+            struct FracItem {
+                int idx;
+                double frac;
+            };
+            std::vector<FracItem> fracs;
+            fracs.reserve(crop.size());
+
+            int remaining = extra_budget_total;
+            for (size_t i = 0; i < crop.size(); ++i) {
+                if (need[i] <= 0) {
+                    extra_alloc[i] = 0;
+                    continue;
+                }
+                const double exact = (double)extra_budget_total * ((double)need[i] / (double)sum_need);
+                const int base = (int)std::floor(exact);
+                extra_alloc[i] = std::min(need[i], std::max(0, base));
+                remaining -= extra_alloc[i];
+                fracs.push_back(FracItem{(int)i, exact - (double)base});
+            }
+
+            std::sort(fracs.begin(), fracs.end(), [&](const FracItem& a, const FracItem& b) {
+                return a.frac > b.frac;
+            });
+
+            for (int k = 0; k < remaining && !fracs.empty(); ++k) {
+                const int idx = fracs[k % (int)fracs.size()].idx;
+                if (extra_alloc[idx] < need[idx]) {
+                    extra_alloc[idx] += 1;
+                }
+            }
+        }
+
+        std::vector<PackedBox> out;
+        out.reserve((size_t)cta_limit);
+        for (size_t i = 0; i < crop.size(); ++i) {
+            PackedBox b = std::move(crop[i]);
+
+            int split_k = 1 + extra_alloc[i];
+
+            // 避免短尾巴：保证每段至少有一定 block 数 / kv token 数，否则减少 split_k。
+            const int min_blocks_per_piece = 4;
+            const int min_kv_tokens_per_piece = std::max(min_blocks_per_piece * block_size, batch_min_kv);
+            if (b.block_table_ptr) {
+                int total_blocks = (int)b.block_table_ptr->size();
+                while (split_k > 1 && (total_blocks + split_k - 1) / split_k < min_blocks_per_piece) {
+                    split_k--;
+                }
+            }
+            while (split_k > 1 && (b.kv_in_CTA + split_k - 1) / split_k < min_kv_tokens_per_piece) {
+                split_k--;
+            }
 
             // 保持 split_per_seq 上限：若已达到上限，退化为不拆分
-            if (get_max_split() >= 32) {
+            if (cur_max_split >= 32) {
                 split_k = 1;
             }
 
             split_box_even_blocks(b, split_k, out);
-            used_cta = (int)out.size();
-            if (used_cta >= CTA_target) break;
+            if ((int)out.size() >= cta_limit) break;
         }
 
-        auto t_split_end = Clock::now();
-        auto t_total_end = Clock::now();
+        // auto t_split_end = Clock::now();
+        // auto t_total_end = Clock::now();
 
-        if (enable_schedule_log) {
-            auto stage_init_us = std::chrono::duration_cast<std::chrono::microseconds>(t_init_end - t_total_begin).count();
-            auto stage_cost_us = std::chrono::duration_cast<std::chrono::microseconds>(t_cost_end - t_init_end).count();
-            auto stage_split_us = std::chrono::duration_cast<std::chrono::microseconds>(t_split_end - t_cost_end).count();
-            auto total_us = std::chrono::duration_cast<std::chrono::microseconds>(t_total_end - t_total_begin).count();
+        // if (enable_schedule_log) {
+        //     auto stage_init_us = std::chrono::duration_cast<std::chrono::microseconds>(t_init_end - t_total_begin).count();
+        //     auto stage_cost_us = std::chrono::duration_cast<std::chrono::microseconds>(t_cost_end - t_init_end).count();
+        //     auto stage_split_us = std::chrono::duration_cast<std::chrono::microseconds>(t_split_end - t_cost_end).count();
+        //     auto total_us = std::chrono::duration_cast<std::chrono::microseconds>(t_total_end - t_total_begin).count();
 
-            std::ofstream ofs(schedule_log_path, std::ios::app);
-            if (ofs) {
-                ofs << "balancePackSota kvHead=" << kvHead
-                    << " HRatio=" << HRatio
-                    << " base_cta=" << base_cta
-                    << " CTA_target=" << CTA_target
-                    << " max_cta=" << max_cta
-                    << " total_kv=" << total_kv
-                    << " target_kv=" << target_kv
-                    << " stage_init_us=" << stage_init_us
-                    << " stage_cost_us=" << stage_cost_us
-                    << " stage_split_us=" << stage_split_us
-                    << " total_us=" << total_us
-                    << "\n";
-            }
-        }
+        //     std::ofstream ofs(schedule_log_path, std::ios::app);
+        //     if (ofs) {
+        //         ofs << "balancePackSota kvHead=" << kvHead
+        //             << " HRatio=" << HRatio
+        //             << " base_cta=" << base_cta
+        //             << " cta_limit=" << cta_limit
+        //             << " cta_cap=" << cta_cap
+        //             << " total_kv=" << total_kv_all
+        //             << " target_kv=" << global_L_kv
+        //             << " stage_init_us=" << stage_init_us
+        //             << " stage_cost_us=" << stage_cost_us
+        //             << " stage_split_us=" << stage_split_us
+        //             << " total_us=" << total_us
+        //             << "\n";
+        //     }        
 
         return out;
     }

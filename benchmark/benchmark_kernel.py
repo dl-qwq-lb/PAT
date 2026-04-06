@@ -245,10 +245,10 @@ def benchmark(
         table = block_table.cpu()
         seq_lens = seq_group.seqlens
 
-        # 1) baseline 调度：use_sota = False，max_cta 设为 -1（不做额外 CTA 上限约束）
+        # 1) baseline 调度：use_sota = False
         tree_base = PrefixTreeCPP(block_size)
         tree_base.build_radix_tree(seq_lens, table)
-        tree_base.pack_schedule(MNWs, nheads_q // nheads_kv, nheads_kv, False, -1)
+        tree_base.pack_schedule(MNWs, nheads_q // nheads_kv, nheads_kv, False)
         tree_base.kernel_info.to_gpu(torch.device(device))
 
         out_pat_base = torch.empty_like(q, device=device, dtype=dtype)
@@ -270,7 +270,7 @@ def benchmark(
         # 2) SOTA 调度：use_sota = True，CTA 上限在 C++ balancePackSota 内部根据 SM 数自动推断
         tree_sota = PrefixTreeCPP(block_size)
         tree_sota.build_radix_tree(seq_lens, table)
-        tree_sota.pack_schedule(MNWs, nheads_q // nheads_kv, nheads_kv, True, -1)
+        tree_sota.pack_schedule(MNWs, nheads_q // nheads_kv, nheads_kv, True)
         tree_sota.kernel_info.to_gpu(torch.device(device))
 
         out_pat_sota = torch.empty_like(q, device=device, dtype=dtype)
