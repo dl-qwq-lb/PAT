@@ -647,6 +647,8 @@ private:
         using Clock = std::chrono::steady_clock;
 
         const bool enable_debug = (std::getenv("PAT_DEBUG_IMBALANCE") != nullptr);
+        bool enable_cost_debug = (std::getenv("PAT_DEBUG_COST") != nullptr);
+        const bool enable_cost_debug_once = (std::getenv("PAT_DEBUG_COST_ONCE") != nullptr);
         const bool enable_schedule_log = (std::getenv("PAT_SCHEDULE_LOG") != nullptr);
         const char* schedule_log_path_env = std::getenv("PAT_SCHEDULE_LOG_PATH");
         const char* schedule_log_path = schedule_log_path_env ? schedule_log_path_env : "schedule.log";
@@ -782,10 +784,29 @@ private:
             const int min_kv_tokens_per_piece = std::max(min_blocks_per_piece * block_size, batch_min_kv);
 
             auto cost_fn = [&](int q_tokens, int kv_tokens) -> double {
-                int TS = 16;
-                const double padded_Q = TS - ((q_tokens - 1) % TS + 1);
-                const double qv = (padded_Q * (double)kv_tokens);
+                int TS = 8;
+                const int q_mod = ((q_tokens - 1) % TS + 1);
+                const int q_pad = TS - q_mod;
+                // NOTE: 当前实现使用 q_pad 作为 qv 乘子（不是 q_tokens 或 round_up(q_tokens, TS)）。
+                // 这也是出现 old_cost ≈ q*kv（例如 q=8 时 q_pad=8）的直接原因。
+                const double q_eff_used = (double)q_pad;
+                const double qv = q_eff_used * (double)kv_tokens;
                 return cost_a * (double)q_tokens + cost_b * qv;
+            };
+
+            auto cost_breakdown = [&](int q_tokens, int kv_tokens,
+                                      int& TS, int& q_mod, int& q_pad,
+                                      double& q_eff_used, double& qv,
+                                      double& term_a, double& term_b,
+                                      double& total) {
+                TS = (q_tokens >= 64 ? 64 : 16);
+                q_mod = ((q_tokens - 1) % TS + 1);
+                q_pad = TS - q_mod;
+                q_eff_used = (double)q_pad;
+                qv = q_eff_used * (double)kv_tokens;
+                term_a = cost_a * (double)q_tokens;
+                term_b = cost_b * qv;
+                total = term_a + term_b;
             };
 
             auto ceil_div_int = [&](int a, int b) -> int {
@@ -796,12 +817,16 @@ private:
             // 不均衡度量（基于当前 crop 的 per-CTA cost）
             double sum_cost = 0.0;
             double max_cost = 0.0;
+            int max_cost_idx = -1;
             for (const auto& b : crop) {
                 const int q = std::max(0, (int)b.q_table.size());
                 const int kv = std::max(0, b.kv_in_CTA);
                 const double cst = cost_fn(q, kv);
                 sum_cost += cst;
-                if (cst > max_cost) max_cost = cst;
+                if (cst > max_cost) {
+                    max_cost = cst;
+                    max_cost_idx = (int)(&b - &crop[0]);
+                }
             }
             const double avg_cost = (crop.empty() ? 0.0 : (sum_cost / (double)crop.size()));
             const double imbalance = (avg_cost > 0.0 ? (max_cost / avg_cost) : 0.0);
@@ -814,7 +839,65 @@ private:
                           << " max/avg=" << imbalance
                           << " max_cost=" << max_cost
                           << " avg_cost=" << avg_cost
+                          << " max_idx=" << max_cost_idx
                           << std::endl;
+            }
+
+            if (enable_cost_debug) {
+                static bool cost_dumped_once = false;
+                if (enable_cost_debug_once && cost_dumped_once) {
+                    enable_cost_debug = false;
+                } else if (enable_cost_debug_once) {
+                    cost_dumped_once = true;
+                }
+            }
+
+            if (enable_cost_debug) {
+                struct Item {
+                    int idx;
+                    int q;
+                    int kv;
+                    double total;
+                };
+                std::vector<Item> items;
+                items.reserve(crop.size());
+                for (size_t i = 0; i < crop.size(); ++i) {
+                    const auto& b = crop[i];
+                    const int q = std::max(0, (int)b.q_table.size());
+                    const int kv = std::max(0, b.kv_in_CTA);
+                    items.push_back(Item{(int)i, q, kv, cost_fn(q, kv)});
+                }
+                std::sort(items.begin(), items.end(), [&](const Item& a, const Item& b) {
+                    return a.total > b.total;
+                });
+
+                const int topk = (int)std::min<size_t>(INT_MAX, items.size());
+                std::cout << "[balancePackSota@cap/cost] model=cost_a*q + cost_b*(q_eff_used*kv)"
+                          << " cost_a=" << cost_a
+                          << " cost_b=" << cost_b
+                          << " (TS=16 or 64, q_eff_used=q_pad=TS-(((q-1)%TS)+1))"
+                          << std::endl;
+                std::cout << "[balancePackSota@cap/cost] top" << topk
+                          << " (idx,q,kv,TS,q_mod,q_pad,q_eff_used,qv,term_a,term_b,total)" << std::endl;
+
+                for (int r = 0; r < topk; ++r) {
+                    const auto& it = items[(size_t)r];
+                    int TS, q_mod, q_pad;
+                    double q_eff_used, qv, term_a, term_b, total;
+                    cost_breakdown(it.q, it.kv, TS, q_mod, q_pad, q_eff_used, qv, term_a, term_b, total);
+                    std::cout << "[balancePackSota@cap/cost] idx=" << it.idx
+                              << " q=" << it.q
+                              << " kv=" << it.kv
+                              << " TS=" << TS
+                              << " q_mod=" << q_mod
+                              << " q_pad=" << q_pad
+                              << " q_eff_used=" << q_eff_used
+                              << " qv=" << qv
+                              << " term_a=" << term_a
+                              << " term_b=" << term_b
+                              << " total=" << total
+                              << std::endl;
+                }
             }
 
             std::vector<int> split_plan(crop.size(), 1);
@@ -868,7 +951,7 @@ private:
                     // 拆分开销：新增 (k-1) 个 CTA 带来的固定 q 侧开销（用 a*q 近似）
                     const double overhead = (double)(k - 1) * (cost_a * (double)q);
 
-                    // 门槛：只有当 “benefit > 1.2 * overhead” 才允许拆
+                    // 门槛：按当前实现，使用 net_gain = benefit - overhead（不再乘 1.2）
                     const double net_gain = benefit - overhead;
                     if (net_gain > best_net_gain) {
                         best_net_gain = net_gain;
@@ -879,16 +962,27 @@ private:
 
                 if (best_k > 1 && best_net_gain > 0.0) {
                     split_plan[i] = best_k;
-                    if (enable_debug) {
-                        std::cout << "[balancePackSota@cap] split idx=" << i
-                                  << " q=" << q
-                                  << " kv=" << kv
-                                  << " old_cost=" << old_cost
-                                  << " best_k=" << best_k
-                                  << " new_cost~=" << best_new_cost
-                                  << " net_gain=" << best_net_gain
-                                  << std::endl;
-                    }
+                }
+
+                if (enable_debug) {
+                    int TS0, q_mod0, q_pad0;
+                    double q_eff0, qv0, term_a0, term_b0, total0;
+                    cost_breakdown(q, kv, TS0, q_mod0, q_pad0, q_eff0, qv0, term_a0, term_b0, total0);
+                    std::cout << "[balancePackSota@cap] split idx=" << i
+                        << " q=" << q
+                        << " kv=" << kv
+                        << " old_cost=" << old_cost
+                        << " (TS=" << TS0
+                        << " q_mod=" << q_mod0
+                        << " q_pad=" << q_pad0
+                        << " qv=" << qv0
+                        << " term_a=" << term_a0
+                        << " term_b=" << term_b0
+                        << ")"
+                        << " best_k=" << best_k
+                        << " new_cost~=" << best_new_cost
+                        << " net_gain=" << best_net_gain
+                        << std::endl;
                 }
             }
 
