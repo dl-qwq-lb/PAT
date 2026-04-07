@@ -205,27 +205,37 @@ def run_single_test_cpp_compare(name: str,
     print(f"  batch_size={len(seq_lens)}, block_size={block_size}")
     print(f"  HRatio={HRatio}, kvHead={kvHead}")
 
-    # 测量 baseline 性能
-    def run_baseline():
+    # 说明：schedule_perf.json 计的是 Python->C++ 调度链路总耗时。
+    # 为避免“构造/持有 kernel_info 张量”影响后续测量，这里在 timed loop 内不返回 kernel_info，
+    # 只在计时完成后各跑一次取出 kernel_info 进行打印与对比。
+
+    padded_tensor = pad_block_table(block_table)
+
+    # --- baseline ---
+    def run_baseline_timed():
         tree = PrefixTreeCPP(block_size)
-        padded_tensor = pad_block_table(block_table)
         tree.build_radix_tree(seq_lens, padded_tensor)
         tree.pack_schedule(MNWs, HRatio, kvHead, False)  # use_sota=False
-        return tree.kernel_info
 
-    time_base = measure_performance(run_baseline)
-    ki_base = run_baseline()
+    time_base = measure_performance(run_baseline_timed)
 
-    # 测量 SOTA 性能
-    def run_sota():
+    tree_base = PrefixTreeCPP(block_size)
+    tree_base.build_radix_tree(seq_lens, padded_tensor)
+    tree_base.pack_schedule(MNWs, HRatio, kvHead, False)
+    ki_base = tree_base.kernel_info
+
+    # --- SOTA ---
+    def run_sota_timed():
         tree = PrefixTreeCPP(block_size)
-        padded_tensor = pad_block_table(block_table)
         tree.build_radix_tree(seq_lens, padded_tensor)
         tree.pack_schedule_sota(MNWs, HRatio, kvHead)
-        return tree.kernel_info
 
-    time_sota = measure_performance(run_sota)
-    ki_sota = run_sota()
+    time_sota = measure_performance(run_sota_timed)
+
+    tree_sota = PrefixTreeCPP(block_size)
+    tree_sota.build_radix_tree(seq_lens, padded_tensor)
+    tree_sota.pack_schedule_sota(MNWs, HRatio, kvHead)
+    ki_sota = tree_sota.kernel_info
 
     print(f"  Performance: baseline={time_base:.6f}s, SOTA={time_sota:.6f}s (avg over 10 runs)")
     print_cpp_kernel_info(ki_base, label=f"C++ KernelInfo [baseline {name}]")

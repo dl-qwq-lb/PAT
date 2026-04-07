@@ -254,7 +254,6 @@ public:
         }
 
         auto cpu_opts = torch::TensorOptions().dtype(torch::kInt32).device(torch::kCPU);
-
         for (const auto& mnw : buckets) {
             auto it = grouped.find(mnw);
             if (it == grouped.end() || it->second.empty()) continue;
@@ -644,14 +643,7 @@ private:
     std::vector<PackedBox> balancePackSota(std::vector<PackedBox> boxes,
                                            int kvHead,
                                            int HRatio = 1) {
-        using Clock = std::chrono::steady_clock;
-
         const bool enable_debug = (std::getenv("PAT_DEBUG_IMBALANCE") != nullptr);
-        const bool enable_schedule_log = (std::getenv("PAT_SCHEDULE_LOG") != nullptr);
-        const char* schedule_log_path_env = std::getenv("PAT_SCHEDULE_LOG_PATH");
-        const char* schedule_log_path = schedule_log_path_env ? schedule_log_path_env : "schedule.log";
-
-        auto t_total_begin = Clock::now();
 
         if (boxes.empty()) return {};
 
@@ -699,8 +691,6 @@ private:
         // 若在此处用 SM 数量对 cta_limit 向下截断，会导致 cta_limit<=base_cta
         // 直接退化为“不拆分”，出现你在 schedule.log 里看到的“分割不足”。
         // 因此这里保留 cta_cap 仅用于日志/调试，不再对 cta_limit 做向下截断。
-
-        auto t_init_end = Clock::now();
 
         int cur_max_split = 0;
         for (int v : split_per_seq) if (v > cur_max_split) cur_max_split = v;
@@ -1062,6 +1052,7 @@ private:
 
         std::vector<PackedBox> out;
         out.reserve((size_t)cta_limit);
+
         for (size_t i = 0; i < crop.size(); ++i) {
             PackedBox b = std::move(crop[i]);
 
@@ -1229,31 +1220,6 @@ private:
                 }
             }
         }
-
-        // auto t_split_end = Clock::now();
-        // auto t_total_end = Clock::now();
-
-        // if (enable_schedule_log) {
-        //     auto stage_init_us = std::chrono::duration_cast<std::chrono::microseconds>(t_init_end - t_total_begin).count();
-        //     auto stage_cost_us = std::chrono::duration_cast<std::chrono::microseconds>(t_cost_end - t_init_end).count();
-        //     auto stage_split_us = std::chrono::duration_cast<std::chrono::microseconds>(t_split_end - t_cost_end).count();
-        //     auto total_us = std::chrono::duration_cast<std::chrono::microseconds>(t_total_end - t_total_begin).count();
-
-        //     std::ofstream ofs(schedule_log_path, std::ios::app);
-        //     if (ofs) {
-        //         ofs << "balancePackSota kvHead=" << kvHead
-        //             << " HRatio=" << HRatio
-        //             << " base_cta=" << base_cta
-        //             << " cta_limit=" << cta_limit
-        //             << " cta_cap=" << cta_cap
-        //             << " total_kv=" << total_kv_all
-        //             << " target_kv=" << global_L_kv
-        //             << " stage_init_us=" << stage_init_us
-        //             << " stage_cost_us=" << stage_cost_us
-        //             << " stage_split_us=" << stage_split_us
-        //             << " total_us=" << total_us
-        //             << "\n";
-        //     }        
 
         return out;
     }

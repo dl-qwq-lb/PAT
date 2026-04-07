@@ -1,4 +1,8 @@
 import pandas as pd
+import matplotlib
+
+# Use a non-interactive backend to ensure PDF generation works in headless environments.
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
@@ -316,7 +320,17 @@ def create_performance_plot(
     tree_to_num = {tree: i for i, tree in enumerate(trees_to_plot)}
 
     # 3. Determine operator columns
-    default_operators = ["fa", "vllm-fa", "flashinfer", "ra", "ra++", "FastTree", "pat"]
+    default_operators = [
+        "fa",
+        "vllm-fa",
+        "flashinfer",
+        "ra",
+        "ra++",
+        "FastTree",
+        "pat",
+        "pat_baseline",
+        "pat_sota",
+    ]
     if operator_order is None:
         operators = default_operators
     else:
@@ -497,10 +511,19 @@ if __name__ == "__main__":
     # create_performance_plot(filename=json_file, list_trees_only=True)
     create_performance_plot(
         filename=json_file,
-        operator_order=["pat", "FastTree", "ra", "ra++", "flashinfer", "vllm-fa"],
+        operator_order=[
+            "pat_baseline",
+            "pat_sota",
+            "FastTree",
+            "ra",
+            "ra++",
+            "flashinfer",
+            "vllm-fa",
+        ],
         selected_indices=list(range(20)),  # None means all
         labels=[
-            "PAT",
+            "PAT-baseline",
+            "PAT-sota",
             "FastTree",
             "RelayAttn",
             "RelayAttn++",
