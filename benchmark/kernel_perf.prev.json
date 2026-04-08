@@ -6,8 +6,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.18799304962158203,
-            "pat_schedule_sota_ms": 0.19109249114990234
+            "pat_schedule_baseline_ms": 0.1773834228515625,
+            "pat_schedule_sota_ms": 0.1794576644897461
         },
         "correctness": {},
         "status": "success",
@@ -23,8 +23,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.18639564514160156,
-            "pat_schedule_sota_ms": 0.20220279693603516
+            "pat_schedule_baseline_ms": 0.1753091812133789,
+            "pat_schedule_sota_ms": 0.18177032470703125
         },
         "correctness": {},
         "status": "success",
@@ -40,8 +40,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.19435882568359375,
-            "pat_schedule_sota_ms": 0.21347999572753906
+            "pat_schedule_baseline_ms": 0.18570423126220703,
+            "pat_schedule_sota_ms": 0.19326210021972656
         },
         "correctness": {},
         "status": "success",
@@ -57,8 +57,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.20406246185302734,
-            "pat_schedule_sota_ms": 0.21240711212158203
+            "pat_schedule_baseline_ms": 0.19938945770263672,
+            "pat_schedule_sota_ms": 0.20046234130859375
         },
         "correctness": {},
         "status": "success",
@@ -74,8 +74,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.19867420196533203,
-            "pat_schedule_sota_ms": 0.20537376403808594
+            "pat_schedule_baseline_ms": 0.1964569091796875,
+            "pat_schedule_sota_ms": 0.1871347427368164
         },
         "correctness": {},
         "status": "success",
@@ -91,8 +91,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.19364356994628906,
-            "pat_schedule_sota_ms": 0.20837783813476562
+            "pat_schedule_baseline_ms": 0.1916646957397461,
+            "pat_schedule_sota_ms": 0.20840167999267578
         },
         "correctness": {},
         "status": "success",
@@ -108,8 +108,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.2051830291748047,
-            "pat_schedule_sota_ms": 0.21545886993408203
+            "pat_schedule_baseline_ms": 0.1863718032836914,
+            "pat_schedule_sota_ms": 0.2088308334350586
         },
         "correctness": {},
         "status": "success",
@@ -125,8 +125,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.20830631256103516,
-            "pat_schedule_sota_ms": 0.22025108337402344
+            "pat_schedule_baseline_ms": 0.1992940902709961,
+            "pat_schedule_sota_ms": 0.21071434020996094
         },
         "correctness": {},
         "status": "success",
@@ -142,8 +142,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.1958608627319336,
-            "pat_schedule_sota_ms": 0.1980304718017578
+            "pat_schedule_baseline_ms": 0.20461082458496094,
+            "pat_schedule_sota_ms": 0.20270347595214844
         },
         "correctness": {},
         "status": "success",
@@ -159,8 +159,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.1970529556274414,
-            "pat_schedule_sota_ms": 0.20530223846435547
+            "pat_schedule_baseline_ms": 0.19228458404541016,
+            "pat_schedule_sota_ms": 0.19762516021728516
         },
         "correctness": {},
         "status": "success",
@@ -176,8 +176,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.20205974578857422,
-            "pat_schedule_sota_ms": 0.20804405212402344
+            "pat_schedule_baseline_ms": 0.2017974853515625,
+            "pat_schedule_sota_ms": 0.2195119857788086
         },
         "correctness": {},
         "status": "success",
@@ -193,8 +193,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.2172708511352539,
-            "pat_schedule_sota_ms": 0.2227783203125
+            "pat_schedule_baseline_ms": 0.19767284393310547,
+            "pat_schedule_sota_ms": 0.2029895782470703
         },
         "correctness": {},
         "status": "success",
@@ -210,8 +210,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.21641254425048828,
-            "pat_schedule_sota_ms": 0.2166748046875
+            "pat_schedule_baseline_ms": 0.20389556884765625,
+            "pat_schedule_sota_ms": 0.1825571060180664
         },
         "correctness": {},
         "status": "success",
@@ -227,8 +227,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.19848346710205078,
-            "pat_schedule_sota_ms": 0.2103567123413086
+            "pat_schedule_baseline_ms": 0.1977682113647461,
+            "pat_schedule_sota_ms": 0.19371509552001953
         },
         "correctness": {},
         "status": "success",
@@ -244,8 +244,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.20792484283447266,
-            "pat_schedule_sota_ms": 0.21564960479736328
+            "pat_schedule_baseline_ms": 0.19769668579101562,
+            "pat_schedule_sota_ms": 0.20759105682373047
         },
         "correctness": {},
         "status": "success",
@@ -261,8 +261,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.23131370544433594,
-            "pat_schedule_sota_ms": 0.22194385528564453
+            "pat_schedule_baseline_ms": 0.2093791961669922,
+            "pat_schedule_sota_ms": 0.2094268798828125
         },
         "correctness": {},
         "status": "success",

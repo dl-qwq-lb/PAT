@@ -666,34 +666,73 @@ private:
         // 按你的要求：不再引入额外的 CTA 预算变量。
         const int cta_limit = threshold_cnt;
 
-        auto infer_max_cta_from_sm = [&]() -> int {
-            static int cached_device = -1;
-            static int cached_max_cta = -1;
-
-            int dev = 0;
-            if (cudaGetDevice(&dev) != cudaSuccess) {
-                return -1;
-            }
-            if (cached_max_cta > 0 && cached_device == dev) {
-                return cached_max_cta;
-            }
-            cudaDeviceProp prop;
-            if (cudaGetDeviceProperties(&prop, dev) != cudaSuccess) {
-                return -1;
-            }
-            cached_device = dev;
-            cached_max_cta = std::max(1, prop.multiProcessorCount);
-            return cached_max_cta;
-        };
-
-        const int cta_cap = infer_max_cta_from_sm();
-        // NOTE: 当前 SOTA 已采用 baseline 的 threshold 语义（cta_limit=threshold_cnt）。
-        // 若在此处用 SM 数量对 cta_limit 向下截断，会导致 cta_limit<=base_cta
-        // 直接退化为“不拆分”，出现你在 schedule.log 里看到的“分割不足”。
-        // 因此这里保留 cta_cap 仅用于日志/调试，不再对 cta_limit 做向下截断。
-
         int cur_max_split = 0;
         for (int v : split_per_seq) if (v > cur_max_split) cur_max_split = v;
+
+        auto ceil_div_int = [&](int a, int b) -> int {
+            if (b <= 0) return 0;
+            return (a + b - 1) / b;
+        };
+
+        // Derive a rough kBlockN (N dimension tile) from (q, kv) and existing MNW bucketing rules.
+        // NOTE: This is NOT FastTree's CMM; it's consistent with the project MNW selection heuristic.
+        auto infer_BN = [&](int q_seqs, int kv_tokens) -> int {
+            int m = 16;
+            const int m_val = q_seqs * std::max(1, HRatio);
+            if (m_val > 32) m = 64;
+            else if (m_val > 16) m = 32;
+
+            int n = 128;
+            if (kv_tokens < 32) n = 16;
+            else if (kv_tokens < 64) n = 32;
+            else if (kv_tokens < 128) n = 64;
+            else n = 128;
+            if (m == 64) {
+                n = std::max(32, n);
+            }
+            return n;
+        };
+
+        // Try to query GPU SM count for a better wave model; fallback to cta_limit if unavailable.
+        const int N_SM = [&]() -> int {
+            int sm = 0;
+            int dev = 0;
+            cudaError_t e0 = cudaGetDevice(&dev);
+            if (e0 != cudaSuccess) return 0;
+            cudaError_t e1 = cudaDeviceGetAttribute(&sm, cudaDevAttrMultiProcessorCount, dev);
+            if (e1 != cudaSuccess) return 0;
+            return sm;
+        }();
+
+        // Cost knobs (kept simple; can be tuned via env without changing code).
+        constexpr double cost_a = 0.1;  // q-side term coefficient
+        constexpr double cost_b = 0.1;  // kv-side / tile term coefficient
+
+        const double cost_gather_per_split = [&]() -> double {
+            const char* env = std::getenv("PAT_GATHER_PER_SPLIT_COST");
+            if (!env) return 0.0;
+            char* endp = nullptr;
+            const double v = std::strtod(env, &endp);
+            if (endp == env) return 0.0;
+            return std::max(0.0, v);
+        }();
+
+        // Reuse existing env var name for the one-time gather launch/base cost.
+        const double cost_kernel_launch = [&]() -> double {
+            const char* env = std::getenv("PAT_GATHER_KERNEL_BASE_COST");
+            if (!env) return 0.0;
+            char* endp = nullptr;
+            const double v = std::strtod(env, &endp);
+            if (endp == env) return 0.0;
+            return std::max(0.0, v);
+        }();
+
+        constexpr double cost_startup_factor = 0.5;  // warmup ~ 0.5 * BN_new (normalized)
+        constexpr double cost_page_factor = 0.01;    // page resolve ~ 0.01 * BN_new (small)
+
+        auto original_cost = [&](int q, int H, int KV) -> double {
+            return cost_a * (double)q * (double)H + cost_b * (double)KV;
+        };
 
         auto split_box_even_blocks = [&](PackedBox& src, int split_k, std::vector<PackedBox>& out) {
             if (!src.block_table_ptr) {
@@ -753,14 +792,8 @@ private:
         // - 若存在过长 chunk，则用成本模型做“k 平均削减”（每个过长 chunk 仅做一次）
         // - 不要求严格把 CTA 限制在阈值以内（因此可能增加 CTA 数）
         if (base_cta >= cta_limit) {
-            // 成本模型：a*q + b*kv + c*q*kv/HRatio
-            // 固定系数避免新增超参；b=2 延续 q:kv=1:2 直觉。
-            constexpr double cost_a = 0.1;
-            constexpr double cost_b = 0.1;
-            constexpr double cost_c = 2.0;
-
             // 最多均分成 n 份（保持与当前实现一致的上限 8）
-            const int max_split_n = 8;
+            const int max_split_n = 16;
             const int min_blocks_per_piece = 4;
 
             int batch_min_kv = INT_MAX;
@@ -771,14 +804,8 @@ private:
             if (batch_min_kv == INT_MAX) batch_min_kv = 1;
             const int min_kv_tokens_per_piece = std::max(min_blocks_per_piece * block_size, batch_min_kv);
 
-            auto cost_fn = [&](int q_tokens, int kv_tokens) -> double {
-                return cost_a * (double)q_tokens * HRatio + cost_b * kv_tokens + cost_c * q_tokens * kv_tokens * HRatio;
-            };
-
-            auto ceil_div_int = [&](int a, int b) -> int {
-                if (b <= 0) return 0;
-                return (a + b - 1) / b;
-            };
+            const int H = std::max(1, HRatio);
+            const int denom_sm = std::max(1, (N_SM > 0 ? N_SM : cta_limit));
 
             // 不均衡度量（基于当前 crop 的 per-CTA cost）
             double sum_cost = 0.0;
@@ -789,7 +816,7 @@ private:
             for (const auto& b : crop) {
                 const int q = std::max(0, (int)b.q_table.size());
                 const int kv = std::max(0, b.kv_in_CTA);
-                const double cst = cost_fn(q, kv);
+                const double cst = original_cost(q, H, kv);
                 sum_cost += cst;
                 const int idx = (int)(&b - &crop[0]);
                 if (cst > max_cost) {
@@ -809,24 +836,24 @@ private:
             const double avg_cost = (crop.empty() ? 0.0 : (sum_cost / (double)crop.size()));
             const double imbalance = (avg_cost > 0.0 ? (max_cost / avg_cost) : 0.0);
 
-            if (enable_debug) {
-                std::cout << "[balancePackSota@cap] kvHead=" << kvHead
-                          << " HRatio=" << HRatio
-                          << " base_cta=" << base_cta
-                          << " cta_limit=" << cta_limit
-                          << " max/avg=" << imbalance
-                          << " max_cost=" << max_cost
-                          << " avg_cost=" << avg_cost
-                          << " max_idx=" << max_cost_idx
-                          << std::endl;
-            }
+            // if (enable_debug) {
+            //     std::cout << "[balancePackSota@cap] kvHead=" << kvHead
+            //               << " HRatio=" << HRatio
+            //               << " base_cta=" << base_cta
+            //               << " cta_limit=" << cta_limit
+            //               << " max/avg=" << imbalance
+            //               << " max_cost=" << max_cost
+            //               << " avg_cost=" << avg_cost
+            //               << " max_idx=" << max_cost_idx
+            //               << std::endl;
+            // }
 
             std::vector<int> split_plan(crop.size(), 1);
             for (size_t i = 0; i < crop.size(); ++i) {
                 const auto& b = crop[i];
                 const int q = std::max(0, (int)b.q_table.size());
                 const int kv = std::max(0, b.kv_in_CTA);
-                const double old_cost = cost_fn(q, kv);
+                const double old_cost = original_cost(q, H, kv);
                 if (!(avg_cost > 0.0) || old_cost <= 1.2 * avg_cost) continue;
 
                 const bool is_bottleneck_cta = (old_cost == max_cost);
@@ -860,65 +887,62 @@ private:
                     return true;
                 };
 
-                // 在 [2, max_k] 中选择收益最大的 k（每个过长 chunk 只执行一次）
+                // 在 [2, max_k] 中选择 net 最小（最划算）的 k（每个过长 chunk 仅做一次）
                 int best_k = 1;
-                double best_net_gain = 0.0;
-                double best_new_cost = old_cost;
+                double best_net = 0.0;  // <0 means beneficial
 
                 for (int k = 2; k <= max_k; ++k) {
                     if (!can_split_k(k)) continue;
+                    const int added_cta = k - 1;
                     const int kv_piece = ceil_div_int(kv, k);
 
-                    const int added_cta = k - 1;
-                    const int kv_total_after = k * kv_piece;
-                    const int kv_pad = std::max(0, kv_total_after - kv);
+                    const int BN = infer_BN(q, kv);
+                    const int BN_new = BN;
+                    const int tiles_before = ceil_div_int(kv, BN);
+                    const int tiles_after  = k * ceil_div_int(kv_piece, BN_new);
+                    const int tile_delta   = std::max(0, tiles_after - tiles_before);
 
-                    // ---- (1) 固定开销 ----
-                    // q 侧重复（每新增 CTA 需要再次读取/处理 Q）：用 cost_fn 的 a*q*HRatio 对齐。
-                    const double q_dup_cost = (double)added_cta * (cost_a * (double)q * (double)HRatio);
-                    // KV padding（ceil 导致的多算 kv）：用 cost_fn 的 b*kv 对齐。
-                    const double kv_pad_cost = (cost_b * (double)kv_pad);
-                    const double fixed_overhead = q_dup_cost + kv_pad_cost;
+                    // ======== (1) Q duplication ========
+                    const double C_q_dup = (double)added_cta * cost_a * (double)q * (double)H;
 
-                    // ---- (2) Wave 调度开销 ----
-                    // 用“波次 makespan”差值来度量拆分收益：T ~= waves * max_cost。
-                    // 使用硬件并发 CTA 数（cta_cap）更贴近“波次”概念；若不可得则回退到 cta_limit。
-                    const int denom = std::max(1, (cta_cap > 0 ? cta_cap : cta_limit));
-                    const int waves_before = (base_cta + denom - 1) / denom;
-                    const int waves_after  = (base_cta + added_cta + denom - 1) / denom;
+                    // ======== (2) KV tile padding waste ========
+                    const double C_tile_pad = cost_b * (double)BN_new * (double)tile_delta;
 
-                    const double split_cta_cost = cost_fn(q, kv_piece);
-                    const double new_max_cost = std::max(max_cost_others, split_cta_cost);
+                    // ======== (3) Pipeline warmup ========
+                    const double cost_startup = cost_startup_factor * cost_b * (double)BN_new;
+                    const double C_warmup = (double)added_cta * cost_startup;
 
-                    const double est_time_before = (double)waves_before * max_cost;
-                    const double est_time_after  = (double)waves_after  * new_max_cost;
-                    const double makespan_benefit = est_time_before - est_time_after;
-                    if (makespan_benefit <= 0.0) continue;
+                    // ======== (4) Wave scheduling ========
+                    const int total_before = base_cta * kvHead;
+                    const int total_after  = (base_cta + added_cta) * kvHead;
+                    const int waves_before = (total_before + denom_sm - 1) / denom_sm;
+                    const int waves_after  = (total_after + denom_sm - 1) / denom_sm;
+                    const int delta_waves  = std::max(0, waves_after - waves_before);
 
-                    // ---- (3) Gather 开销（可选） ----
-                    // 默认 0；可用 PAT_GATHER_KERNEL_BASE_COST 指定一次性开销。
-                    const double gather_kernel_base_cost = [&]() -> double {
-                        const char* env = std::getenv("PAT_GATHER_KERNEL_BASE_COST");
-                        if (!env) return 0.0;
-                        char* endp = nullptr;
-                        const double v = std::strtod(env, &endp);
-                        if (endp == env) return 0.0;
-                        return std::max(0.0, v);
-                    }();
-                    const bool first_trigger_gather = (cur_max_split <= 1);
-                    const double gather_overhead = (first_trigger_gather && k > 1) ? gather_kernel_base_cost : 0.0;
+                    const double split_cta_cost = original_cost(q, H, kv_piece);
+                    const double new_bottleneck = std::max(max_cost_others, split_cta_cost);
+                    const double C_wave = (double)delta_waves * new_bottleneck;
 
-                    // ---- 最终决策 ----
-                    const double net_overhead = fixed_overhead + gather_overhead;
-                    const double net_gain = makespan_benefit - net_overhead;
-                    if (net_gain > best_net_gain) {
-                        best_net_gain = net_gain;
+                    // ======== (5) Gather kernel ========
+                    const double C_gather_incremental = (double)q * (double)kvHead * (double)H * (double)added_cta * cost_gather_per_split;
+                    const double C_gather_launch = ((cur_max_split <= 1) && (k > 1)) ? cost_kernel_launch : 0.0;
+                    const double C_gather = C_gather_incremental + C_gather_launch;
+
+                    // ======== (6) Page table resolve ========
+                    const double cost_page_resolve = cost_page_factor * cost_b * (double)BN_new;
+                    const double C_page = (double)tile_delta * cost_page_resolve;
+
+                    // ======== (7) Benefit (bottleneck reduction) ========
+                    const double Benefit = is_bottleneck_cta ? (old_cost - split_cta_cost) : 0.0;
+
+                    const double net = C_q_dup + C_tile_pad + C_warmup + C_wave + C_gather + C_page - Benefit;
+                    if (net < best_net) {
+                        best_net = net;
                         best_k = k;
-                        best_new_cost = split_cta_cost;
                     }
                 }
 
-                if (best_k > 1 && best_net_gain > 0.0) {
+                if (best_k > 1 && best_net < 0.0) {
                     split_plan[i] = best_k;
                 }
 
@@ -1089,18 +1113,8 @@ private:
             if (!budget_tight) {
                 const int spare_cta = cta_limit - (int)out.size();
                 if (spare_cta > 0 && cur_max_split < 32) {
-                    constexpr double cost_a = 0.1;
-                    constexpr double cost_b = 0.1;
-                    constexpr double cost_c = 2.0;
-
-                    auto cost_fn = [&](int q_tokens, int kv_tokens) -> double {
-                        return cost_a * (double)q_tokens * (double)HRatio + cost_b * (double)kv_tokens + cost_c * (double)q_tokens * (double)kv_tokens * (double)HRatio;
-                    };
-
-                    auto ceil_div_int = [&](int a, int b) -> int {
-                        if (b <= 0) return 0;
-                        return (a + b - 1) / b;
-                    };
+                    const int H = std::max(1, HRatio);
+                    const int denom_sm = std::max(1, (N_SM > 0 ? N_SM : cta_limit));
 
                     // CTA 仍有富余时的细分：只需避免“过碎”带来的纯调度开销。
                     // 这里不再用 batch_min_kv 把最小片段钉死（否则容易出现 out.size()<cta_limit 但无法继续拆）。
@@ -1126,40 +1140,54 @@ private:
                         return add_lim >= 1;
                     };
 
-                    auto estimate_best_bisect_gain = [&](int idx, int denom, double max_cost, double second_max_cost, int max_cost_count) -> double {
+                    auto estimate_bisect_net = [&](int idx, double max_cost, double second_max_cost, int max_cost_count) -> double {
                         if (idx < 0 || idx >= (int)out.size()) return 0.0;
                         const auto& b = out[idx];
                         if (!can_bisect(b)) return 0.0;
 
                         const int q = std::max(0, (int)b.q_table.size());
                         const int kv = std::max(0, b.kv_in_CTA);
-                        const double old_cost = cost_fn(q, kv);
+                        const double old_cost = original_cost(q, H, kv);
                         if (old_cost <= 0.0) return 0.0;
 
                         const bool is_bottleneck_cta = (old_cost == max_cost);
                         const double max_cost_others = (is_bottleneck_cta && max_cost_count == 1) ? second_max_cost : max_cost;
 
-                        const int waves_before = ((int)out.size() + denom - 1) / denom;
-                        const int waves_after  = ((int)out.size() + 1 + denom - 1) / denom;
-
-                        // 估计二分后的单片 kv
+                        const int k = 2;
+                        const int added_cta = 1;
                         const int kv_piece = std::max(min_kv_tokens_per_piece, ceil_div_int(kv, 2));
-                        const double piece_cost = cost_fn(q, kv_piece);
-                        const double new_max_cost = std::max(max_cost_others, piece_cost);
 
-                        const double est_time_before = (double)waves_before * max_cost;
-                        const double est_time_after  = (double)waves_after  * new_max_cost;
-                        const double makespan_gain = est_time_before - est_time_after;
+                        const int BN = infer_BN(q, kv);
+                        const int BN_new = BN;
+                        const int tiles_before = ceil_div_int(kv, BN);
+                        const int tiles_after  = k * ceil_div_int(kv_piece, BN_new);
+                        const int tile_delta   = std::max(0, tiles_after - tiles_before);
 
-                        // 若 waves 不增加且该 box 属于 bottleneck，则允许“破平局”式细分：
-                        // 即使短期 makespan_gain==0（因为 max 有并列），也先把其中一个最大项降下去，
-                        // 使后续有机会整体降低 max。
-                        if (makespan_gain > 0.0) return makespan_gain;
-                        if (waves_after == waves_before && is_bottleneck_cta && piece_cost < old_cost) {
-                            // 用一个很小的正值作为“可执行”信号，同时按局部降幅排序。
-                            return 1e-9 + (old_cost - piece_cost);
-                        }
-                        return 0.0;
+                        const double C_q_dup = (double)added_cta * cost_a * (double)q * (double)H;
+                        const double C_tile_pad = cost_b * (double)BN_new * (double)tile_delta;
+                        const double cost_startup = cost_startup_factor * cost_b * (double)BN_new;
+                        const double C_warmup = (double)added_cta * cost_startup;
+
+                        const int total_before = (int)out.size() * kvHead;
+                        const int total_after  = ((int)out.size() + added_cta) * kvHead;
+                        const int waves_before = (total_before + denom_sm - 1) / denom_sm;
+                        const int waves_after  = (total_after + denom_sm - 1) / denom_sm;
+                        const int delta_waves  = std::max(0, waves_after - waves_before);
+
+                        const double split_cta_cost = original_cost(q, H, kv_piece);
+                        const double new_bottleneck = std::max(max_cost_others, split_cta_cost);
+                        const double C_wave = (double)delta_waves * new_bottleneck;
+
+                        const double C_gather_incremental = (double)q * (double)kvHead * (double)H * (double)added_cta * cost_gather_per_split;
+                        const double C_gather_launch = ((cur_max_split <= 1) && (k > 1)) ? cost_kernel_launch : 0.0;
+                        const double C_gather = C_gather_incremental + C_gather_launch;
+
+                        const double cost_page_resolve = cost_page_factor * cost_b * (double)BN_new;
+                        const double C_page = (double)tile_delta * cost_page_resolve;
+
+                        const double Benefit = is_bottleneck_cta ? (old_cost - split_cta_cost) : 0.0;
+                        const double net = C_q_dup + C_tile_pad + C_warmup + C_wave + C_gather + C_page - Benefit;
+                        return net;
                     };
 
                     // 贪心：每次挑选“预计 makespan 改善”最大的 box 做二分
@@ -1172,7 +1200,7 @@ private:
                         for (const auto& b : out) {
                             const int q = std::max(0, (int)b.q_table.size());
                             const int kv = std::max(0, b.kv_in_CTA);
-                            const double cst = cost_fn(q, kv);
+                            const double cst = original_cost(q, H, kv);
                             if (cst > max_cost) {
                                 second_max_cost = max_cost;
                                 max_cost = cst;
@@ -1185,20 +1213,17 @@ private:
                         }
                         if (max_cost <= 0.0) break;
 
-                        const int denom = std::max(1, (cta_cap > 0 ? cta_cap : cta_limit));
-
                         int best_idx = -1;
-                        double best_gain = 0.0;
-                        // out.size() <= 54（典型阈值），线性扫描足够且避免 heap 额外维护成本
+                        double best_net = 0.0;  // <0 means beneficial
                         for (int i = 0; i < (int)out.size(); ++i) {
-                            const double gain = estimate_best_bisect_gain(i, denom, max_cost, second_max_cost, max_cost_count);
-                            if (gain > best_gain) {
-                                best_gain = gain;
+                            const double net = estimate_bisect_net(i, max_cost, second_max_cost, max_cost_count);
+                            if (net < best_net) {
+                                best_net = net;
                                 best_idx = i;
                             }
                         }
 
-                        if (best_idx < 0 || best_gain <= 0.0) {
+                        if (best_idx < 0 || best_net >= 0.0) {
                             break;
                         }
 
