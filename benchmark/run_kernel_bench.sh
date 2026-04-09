@@ -23,6 +23,12 @@ TREES=(
     # "8,16,32,256_512,512,256,32"
     # "256_1024"
     # "256_4096"
+
+    "1,16_16384,32"
+    "1,2048_512,128"
+    "1,4,16,64_1024,512,256,128"
+    "1,32,128_256,4096,64"
+    "1,64,4096_128,128,128"
 )
 
 HEAD_CONFIGS=(
@@ -93,34 +99,34 @@ RL_INDICES=${RL_INDICES:-"0 1 2 3"}   # space-separated indices, e.g. "0 1 2"
 RL_ITERS=${RL_ITERS:-10}
 RL_WARMUP=${RL_WARMUP:-3}
 
-for rl_idx in $RL_INDICES; do
-  for config in "${HEAD_CONFIGS[@]}"; do
-    read -r hq hkv <<< "$config"
-    echo -e "\n[RL] idx=${rl_idx} config=(nh_q:${hq},nh_kv:${hkv})" >> "$SCHEDULE_LOG_FILE"
+# for rl_idx in $RL_INDICES; do
+#   for config in "${HEAD_CONFIGS[@]}"; do
+#     read -r hq hkv <<< "$config"
+#     echo -e "\n[RL] idx=${rl_idx} config=(nh_q:${hq},nh_kv:${hkv})" >> "$SCHEDULE_LOG_FILE"
 
-    EXTRA_RL_ARGS=()
-    if [[ -n "${RL_DEBUG_DIR}" ]]; then
-      mkdir -p "${RL_DEBUG_DIR}"
-      EXTRA_RL_ARGS+=(
-        --dump_tree_json "${RL_DEBUG_DIR}/rl_tree_idx${rl_idx}_hq${hq}_hkv${hkv}.json"
-        --dump_kernel_info_json "${RL_DEBUG_DIR}/rl_kernel_info_idx${rl_idx}_hq${hq}_hkv${hkv}.json"
-        --dump_kernel_info_max_ctas "${RL_DEBUG_MAX_CTAS:-0}"
-      )
-    fi
+#     EXTRA_RL_ARGS=()
+#     if [[ -n "${RL_DEBUG_DIR}" ]]; then
+#       mkdir -p "${RL_DEBUG_DIR}"
+#       EXTRA_RL_ARGS+=(
+#         --dump_tree_json "${RL_DEBUG_DIR}/rl_tree_idx${rl_idx}_hq${hq}_hkv${hkv}.json"
+#         --dump_kernel_info_json "${RL_DEBUG_DIR}/rl_kernel_info_idx${rl_idx}_hq${hq}_hkv${hkv}.json"
+#         --dump_kernel_info_max_ctas "${RL_DEBUG_MAX_CTAS:-0}"
+#       )
+#     fi
 
-    python ./run_rl_testcase.py \
-      --path "$RL_TESTCASE_PATH" \
-      --index "$rl_idx" \
-      --nheads_q "$hq" \
-      --nheads_kv "$hkv" \
-      --iterations "$RL_ITERS" \
-      --warmup "$RL_WARMUP" \
-      --kernel_output_file "$OUTPUT_FILE" \
-      --schedule_output_file "$SCHEDULE_OUTPUT_FILE" \
-      --schedule_log_file "$SCHEDULE_LOG_FILE" \
-      "${EXTRA_RL_ARGS[@]}" \
-      >> "$SCHEDULE_LOG_FILE" 2>&1
-  done
-done
+#     python ./run_rl_testcase.py \
+#       --path "$RL_TESTCASE_PATH" \
+#       --index "$rl_idx" \
+#       --nheads_q "$hq" \
+#       --nheads_kv "$hkv" \
+#       --iterations "$RL_ITERS" \
+#       --warmup "$RL_WARMUP" \
+#       --kernel_output_file "$OUTPUT_FILE" \
+#       --schedule_output_file "$SCHEDULE_OUTPUT_FILE" \
+#       --schedule_log_file "$SCHEDULE_LOG_FILE" \
+#       "${EXTRA_RL_ARGS[@]}" \
+#       >> "$SCHEDULE_LOG_FILE" 2>&1
+#   done
+# done
 
 echo -e "\nDone."

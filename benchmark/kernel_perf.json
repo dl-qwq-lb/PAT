@@ -1,274 +1,438 @@
 [
     {
-        "tree": "RL(index=0,pid=1955100)",
+        "tree": "1,16_16384,32",
         "nheads_q": 32,
         "nheads_kv": 32,
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.18799304962158203,
-            "pat_schedule_sota_ms": 0.19109249114990234
+            "flashinfer": 0.9849599897861481,
+            "vllm-fa": 2.0888160467147827,
+            "ra++": 0.3807840049266815,
+            "ra": 0.38439999520778656,
+            "pat_baseline": 0.5447679758071899,
+            "pat_sota": 0.5444320142269135,
+            "FastTree": 0.3808159977197647,
+            "fa": 4.451839923858643,
+            "DeFT": 0.45158401131629944,
+            "cascade": 0.38707199692726135
         },
-        "correctness": {},
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.7285346984863281e-06
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 9.435415267944336e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 9.435415267944336e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.7881393432617188e-07
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.7881393432617188e-07
+            },
+            "FastTree": {
+                "status": "PASSED",
+                "max_diff": 3.0517578125e-05,
+                "mean_diff": 2.8014183044433594e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 3.0517578125e-05,
+                "mean_diff": 3.3974647521972656e-06
+            }
+        },
         "status": "success",
-        "error": null,
-        "source": "RL_testcase",
-        "pid": 1955100,
-        "index": 0
+        "error": null
     },
     {
-        "tree": "RL(index=0,pid=1955100)",
+        "tree": "1,16_16384,32",
         "nheads_q": 16,
         "nheads_kv": 8,
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.18639564514160156,
-            "pat_schedule_sota_ms": 0.20220279693603516
+            "flashinfer": 0.26521599292755127,
+            "vllm-fa": 0.5273600220680237,
+            "ra++": 0.1157120019197464,
+            "ra": 0.11366400122642517,
+            "pat_baseline": 0.09113600105047226,
+            "pat_sota": 0.08806400001049042,
+            "DeFT": 0.2016960009932518,
+            "cascade": 0.13414399325847626
         },
-        "correctness": {},
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.621246337890625e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.3709068298339844e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.3709068298339844e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 2.1457672119140625e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 2.086162567138672e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 3.0517578125e-05,
+                "mean_diff": 3.337860107421875e-06
+            }
+        },
         "status": "success",
-        "error": null,
-        "source": "RL_testcase",
-        "pid": 1955100,
-        "index": 0
+        "error": null
     },
     {
-        "tree": "RL(index=0,pid=1955100)",
+        "tree": "1,16_16384,32",
         "nheads_q": 32,
         "nheads_kv": 8,
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.19435882568359375,
-            "pat_schedule_sota_ms": 0.21347999572753906
+            "flashinfer": 0.30105599761009216,
+            "vllm-fa": 0.5611200034618378,
+            "ra++": 0.24883200228214264,
+            "ra": 0.2391040027141571,
+            "pat_baseline": 0.09625600278377533,
+            "pat_sota": 0.09375999867916107,
+            "FastTree": 0.18422400206327438,
+            "fa": 1.1539999842643738,
+            "DeFT": 0.22009599953889847,
+            "cascade": 0.14235199987888336
         },
-        "correctness": {},
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.5795230865478516e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.4424324035644531e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.4424324035644531e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 2.1457672119140625e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 2.0265579223632812e-06
+            },
+            "FastTree": {
+                "status": "FAILED",
+                "max_diff": 943.0,
+                "mean_diff": 0.358642578125
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 3.0517578125e-05,
+                "mean_diff": 3.337860107421875e-06
+            }
+        },
         "status": "success",
-        "error": null,
-        "source": "RL_testcase",
-        "pid": 1955100,
-        "index": 0
+        "error": null
     },
     {
-        "tree": "RL(index=0,pid=1955100)",
+        "tree": "1,16_16384,32",
         "nheads_q": 64,
         "nheads_kv": 8,
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.20406246185302734,
-            "pat_schedule_sota_ms": 0.21240711212158203
+            "flashinfer": 0.27955199778079987,
+            "vllm-fa": 0.5611519813537598,
+            "ra++": 0.35225600004196167,
+            "ra": 0.3389119952917099,
+            "pat_baseline": 0.15875200182199478,
+            "pat_sota": 0.13252799957990646,
+            "DeFT": 0.7459360063076019,
+            "cascade": 0.16515200585126877
         },
-        "correctness": {},
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.531839370727539e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.430511474609375e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.430511474609375e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 1.8477439880371094e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 1.9073486328125e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 3.0517578125e-05,
+                "mean_diff": 3.2782554626464844e-06
+            }
+        },
         "status": "success",
-        "error": null,
-        "source": "RL_testcase",
-        "pid": 1955100,
-        "index": 0
+        "error": null
     },
     {
-        "tree": "RL(index=1,pid=1954796)",
+        "tree": "1,2048_512,128",
         "nheads_q": 32,
         "nheads_kv": 32,
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.19867420196533203,
-            "pat_schedule_sota_ms": 0.20537376403808594
+            "flashinfer": 6.756319999694824,
+            "vllm-fa": 10.540463924407959,
+            "ra++": 4.762207984924316,
+            "ra": 4.737344026565552,
+            "pat_baseline": 4.968896150588989,
+            "pat_sota": 4.968255996704102,
+            "FastTree": 4.940800189971924,
+            "fa": 22.10489559173584,
+            "DeFT": 5.680176019668579,
+            "cascade": 4.799391984939575
         },
-        "correctness": {},
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 9.47713851928711e-06
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 1.1682510375976562e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 1.2874603271484375e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 4.410743713378906e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 4.410743713378906e-06
+            },
+            "FastTree": {
+                "status": "PASSED",
+                "max_diff": 0.000244140625,
+                "mean_diff": 1.233816146850586e-05
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 1.5795230865478516e-05
+            }
+        },
         "status": "success",
-        "error": null,
-        "source": "RL_testcase",
-        "pid": 1954796,
-        "index": 1
+        "error": null
     },
     {
-        "tree": "RL(index=1,pid=1954796)",
+        "tree": "1,2048_512,128",
         "nheads_q": 16,
         "nheads_kv": 8,
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.19364356994628906,
-            "pat_schedule_sota_ms": 0.20837783813476562
+            "flashinfer": 1.5370240211486816,
+            "vllm-fa": 2.855936050415039,
+            "ra++": 1.302511990070343,
+            "ra": 1.2933119535446167,
+            "pat_baseline": 1.3957120180130005,
+            "pat_sota": 1.389519989490509,
+            "DeFT": 2.172416090965271,
+            "cascade": 1.3163520097732544
         },
-        "correctness": {},
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.1980533599853516e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.3589859008789062e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.4841556549072266e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 4.410743713378906e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 4.410743713378906e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 1.5795230865478516e-05
+            }
+        },
         "status": "success",
-        "error": null,
-        "source": "RL_testcase",
-        "pid": 1954796,
-        "index": 1
+        "error": null
     },
     {
-        "tree": "RL(index=1,pid=1954796)",
+        "tree": "1,2048_512,128",
         "nheads_q": 32,
         "nheads_kv": 8,
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.2051830291748047,
-            "pat_schedule_sota_ms": 0.21545886993408203
+            "flashinfer": 1.5194720029830933,
+            "vllm-fa": 2.8567839860916138,
+            "ra++": 1.4392319917678833,
+            "ra": 1.4130079746246338,
+            "pat_baseline": 1.6275519728660583,
+            "pat_sota": 1.6093279719352722,
+            "FastTree": 1.560208022594452,
+            "fa": 5.650367975234985,
+            "DeFT": 2.4181439876556396,
+            "cascade": 1.4099839925765991
         },
-        "correctness": {},
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 1.2040138244628906e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.2636184692382812e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.3828277587890625e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 4.410743713378906e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 4.410743713378906e-06
+            },
+            "FastTree": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 1.233816146850586e-05
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 1.5795230865478516e-05
+            }
+        },
         "status": "success",
-        "error": null,
-        "source": "RL_testcase",
-        "pid": 1954796,
-        "index": 1
+        "error": null
     },
     {
-        "tree": "RL(index=1,pid=1954796)",
+        "tree": "1,2048_512,128",
         "nheads_q": 64,
         "nheads_kv": 8,
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_schedule_baseline_ms": 0.20830631256103516,
-            "pat_schedule_sota_ms": 0.22025108337402344
+            "flashinfer": 1.5768960118293762,
+            "vllm-fa": 2.8584320545196533,
+            "ra++": 1.6501760482788086,
+            "ra": 1.5994880199432373,
+            "pat_baseline": 1.8713760375976562,
+            "pat_sota": 1.8708479404449463,
+            "DeFT": 10.725744247436523,
+            "cascade": 1.6225119829177856
         },
-        "correctness": {},
-        "status": "success",
-        "error": null,
-        "source": "RL_testcase",
-        "pid": 1954796,
-        "index": 1
-    },
-    {
-        "tree": "RL(index=2,pid=1954796)",
-        "nheads_q": 32,
-        "nheads_kv": 32,
-        "head_dim": 128,
-        "block_size": 32,
-        "latencies": {
-            "pat_schedule_baseline_ms": 0.1958608627319336,
-            "pat_schedule_sota_ms": 0.1980304718017578
+        "correctness": {
+            "flashinfer": {
+                "status": "PASSED",
+                "max_diff": 0.001953125,
+                "mean_diff": 1.2099742889404297e-05
+            },
+            "ra++": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.2099742889404297e-05
+            },
+            "ra": {
+                "status": "PASSED",
+                "max_diff": 0.00390625,
+                "mean_diff": 1.33514404296875e-05
+            },
+            "pat_baseline": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 4.470348358154297e-06
+            },
+            "pat_sota": {
+                "status": "PASSED",
+                "max_diff": 0.0009765625,
+                "mean_diff": 4.470348358154297e-06
+            },
+            "DeFT": {
+                "status": "PASSED",
+                "max_diff": 0.00048828125,
+                "mean_diff": 1.5795230865478516e-05
+            }
         },
-        "correctness": {},
         "status": "success",
-        "error": null,
-        "source": "RL_testcase",
-        "pid": 1954796,
-        "index": 2
-    },
-    {
-        "tree": "RL(index=2,pid=1954796)",
-        "nheads_q": 16,
-        "nheads_kv": 8,
-        "head_dim": 128,
-        "block_size": 32,
-        "latencies": {
-            "pat_schedule_baseline_ms": 0.1970529556274414,
-            "pat_schedule_sota_ms": 0.20530223846435547
-        },
-        "correctness": {},
-        "status": "success",
-        "error": null,
-        "source": "RL_testcase",
-        "pid": 1954796,
-        "index": 2
-    },
-    {
-        "tree": "RL(index=2,pid=1954796)",
-        "nheads_q": 32,
-        "nheads_kv": 8,
-        "head_dim": 128,
-        "block_size": 32,
-        "latencies": {
-            "pat_schedule_baseline_ms": 0.20205974578857422,
-            "pat_schedule_sota_ms": 0.20804405212402344
-        },
-        "correctness": {},
-        "status": "success",
-        "error": null,
-        "source": "RL_testcase",
-        "pid": 1954796,
-        "index": 2
-    },
-    {
-        "tree": "RL(index=2,pid=1954796)",
-        "nheads_q": 64,
-        "nheads_kv": 8,
-        "head_dim": 128,
-        "block_size": 32,
-        "latencies": {
-            "pat_schedule_baseline_ms": 0.2172708511352539,
-            "pat_schedule_sota_ms": 0.2227783203125
-        },
-        "correctness": {},
-        "status": "success",
-        "error": null,
-        "source": "RL_testcase",
-        "pid": 1954796,
-        "index": 2
-    },
-    {
-        "tree": "RL(index=3,pid=1954796)",
-        "nheads_q": 32,
-        "nheads_kv": 32,
-        "head_dim": 128,
-        "block_size": 32,
-        "latencies": {
-            "pat_schedule_baseline_ms": 0.21641254425048828,
-            "pat_schedule_sota_ms": 0.2166748046875
-        },
-        "correctness": {},
-        "status": "success",
-        "error": null,
-        "source": "RL_testcase",
-        "pid": 1954796,
-        "index": 3
-    },
-    {
-        "tree": "RL(index=3,pid=1954796)",
-        "nheads_q": 16,
-        "nheads_kv": 8,
-        "head_dim": 128,
-        "block_size": 32,
-        "latencies": {
-            "pat_schedule_baseline_ms": 0.19848346710205078,
-            "pat_schedule_sota_ms": 0.2103567123413086
-        },
-        "correctness": {},
-        "status": "success",
-        "error": null,
-        "source": "RL_testcase",
-        "pid": 1954796,
-        "index": 3
-    },
-    {
-        "tree": "RL(index=3,pid=1954796)",
-        "nheads_q": 32,
-        "nheads_kv": 8,
-        "head_dim": 128,
-        "block_size": 32,
-        "latencies": {
-            "pat_schedule_baseline_ms": 0.20792484283447266,
-            "pat_schedule_sota_ms": 0.21564960479736328
-        },
-        "correctness": {},
-        "status": "success",
-        "error": null,
-        "source": "RL_testcase",
-        "pid": 1954796,
-        "index": 3
-    },
-    {
-        "tree": "RL(index=3,pid=1954796)",
-        "nheads_q": 64,
-        "nheads_kv": 8,
-        "head_dim": 128,
-        "block_size": 32,
-        "latencies": {
-            "pat_schedule_baseline_ms": 0.23131370544433594,
-            "pat_schedule_sota_ms": 0.22194385528564453
-        },
-        "correctness": {},
-        "status": "success",
-        "error": null,
-        "source": "RL_testcase",
-        "pid": 1954796,
-        "index": 3
+        "error": null
     }
 ]

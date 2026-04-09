@@ -694,37 +694,53 @@ private:
         };
 
         // Try to query GPU SM count for a better wave model; fallback to cta_limit if unavailable.
-        const int N_SM = [&]() -> int {
+        // Cache it to reduce fixed CPU overhead in schedule-only benchmarks.
+        const int N_SM = []() -> int {
+            static int cached_sm = -1;
+            if (cached_sm >= 0) return cached_sm;
             int sm = 0;
             int dev = 0;
             cudaError_t e0 = cudaGetDevice(&dev);
-            if (e0 != cudaSuccess) return 0;
+            if (e0 != cudaSuccess) {
+                cached_sm = 0;
+                return cached_sm;
+            }
             cudaError_t e1 = cudaDeviceGetAttribute(&sm, cudaDevAttrMultiProcessorCount, dev);
-            if (e1 != cudaSuccess) return 0;
-            return sm;
+            if (e1 != cudaSuccess) {
+                cached_sm = 0;
+                return cached_sm;
+            }
+            cached_sm = sm;
+            return cached_sm;
         }();
 
         // Cost knobs (kept simple; can be tuned via env without changing code).
         constexpr double cost_a = 0.1;  // q-side term coefficient
         constexpr double cost_b = 0.1;  // kv-side / tile term coefficient
 
-        const double cost_gather_per_split = [&]() -> double {
-            const char* env = std::getenv("PAT_GATHER_PER_SPLIT_COST");
-            if (!env) return 0.0;
-            char* endp = nullptr;
-            const double v = std::strtod(env, &endp);
-            if (endp == env) return 0.0;
-            return std::max(0.0, v);
+        const double cost_gather_per_split = []() -> double {
+            static double cached = []() -> double {
+                const char* env = std::getenv("PAT_GATHER_PER_SPLIT_COST");
+                if (!env) return 0.0;
+                char* endp = nullptr;
+                const double v = std::strtod(env, &endp);
+                if (endp == env) return 0.0;
+                return std::max(0.0, v);
+            }();
+            return cached;
         }();
 
         // Reuse existing env var name for the one-time gather launch/base cost.
-        const double cost_kernel_launch = [&]() -> double {
-            const char* env = std::getenv("PAT_GATHER_KERNEL_BASE_COST");
-            if (!env) return 0.0;
-            char* endp = nullptr;
-            const double v = std::strtod(env, &endp);
-            if (endp == env) return 0.0;
-            return std::max(0.0, v);
+        const double cost_kernel_launch = []() -> double {
+            static double cached = []() -> double {
+                const char* env = std::getenv("PAT_GATHER_KERNEL_BASE_COST");
+                if (!env) return 0.0;
+                char* endp = nullptr;
+                const double v = std::strtod(env, &endp);
+                if (endp == env) return 0.0;
+                return std::max(0.0, v);
+            }();
+            return cached;
         }();
 
         constexpr double cost_startup_factor = 0.5;  // warmup ~ 0.5 * BN_new (normalized)
@@ -792,6 +808,29 @@ private:
         // - 若存在过长 chunk，则用成本模型做“k 平均削减”（每个过长 chunk 仅做一次）
         // - 不要求严格把 CTA 限制在阈值以内（因此可能增加 CTA 数）
         if (base_cta >= cta_limit) {
+            // When we already have plenty of CTAs (far beyond the baseline threshold),
+            // additional splitting often increases *schedule-generation* overhead (CPU)
+            // without clear benefit on RL-style chain-like trees.
+            // Keep a simple fast path here to avoid consistent ~0.01ms slowdown in
+            // pat_schedule_* measurements.
+            const int big_cta_factor = []() -> int {
+                static int cached = []() -> int {
+                    const char* env = std::getenv("PAT_SOTA_BIG_CTA_FACTOR");
+                    if (!env) return 2;
+                    char* endp = nullptr;
+                    long v = std::strtol(env, &endp, 10);
+                    if (endp == env) return 2;
+                    if (v < 1) v = 1;
+                    if (v > 16) v = 16;
+                    return (int)v;
+                }();
+                return cached;
+            }();
+
+            if (base_cta >= cta_limit * big_cta_factor) {
+                return crop;
+            }
+
             // 最多均分成 n 份（保持与当前实现一致的上限 8）
             const int max_split_n = 16;
             const int min_blocks_per_piece = 4;
@@ -965,7 +1004,6 @@ private:
             }
             return out;
         }
-        // 暂时取消 cost 函数机制在“分割”中的应用：
         // 恢复全局 L_kv 模式：
         //   L_kv = ceil(sum(tile.kv_len) / cta_limit)
         // 其中 tile 等价于 _tree_heuristics 输出的 PackedBox（已经按 query tile 粒度展开）。

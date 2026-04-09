@@ -443,16 +443,20 @@ def main():
     tree_sota.pack_schedule_sota(None, HRatio, kvHead)
     ki_sota = tree_sota.kernel_info
 
-    # Lightweight comparison: num_split_per_seq only (cheap + stable)
-    comp_pass = True
+    # Comparison: use a cheap but more meaningful kernel_info signature.
+    # NOTE: num_split_per_seq-only is too weak and often stays True even when schedules differ.
+    base_sig = summarize_kernel_info(ki_base)
+    sota_sig = summarize_kernel_info(ki_sota)
+    sig_keys = [
+        "MNWs",
+        "max_split_per_seq",
+        "max_seqs_in_CTA",
+        "max_blocks_in_CTA",
+        "num_split_per_seq",
+        "kv_in_CTAs_stats",
+    ]
     try:
-        a = ki_base.num_split_per_seq
-        b = ki_sota.num_split_per_seq
-        if isinstance(a, torch.Tensor):
-            a = a.cpu().tolist()
-        if isinstance(b, torch.Tensor):
-            b = b.cpu().tolist()
-        comp_pass = list(a) == list(b)
+        comp_pass = {k: base_sig.get(k) for k in sig_keys} == {k: sota_sig.get(k) for k in sig_keys}
     except Exception:
         comp_pass = False
 
@@ -476,8 +480,8 @@ def main():
         "nheads_q": args.nheads_q,
         "nheads_kv": args.nheads_kv,
         "result": result,
-        "kernel_info_baseline": summarize_kernel_info(ki_base),
-        "kernel_info_sota": summarize_kernel_info(ki_sota),
+        "kernel_info_baseline": base_sig,
+        "kernel_info_sota": sota_sig,
     }
 
     if args.dump_tree_json:
@@ -512,7 +516,7 @@ def main():
     print(f"  batch_size={len(seq_lens)}, block_size={block_size}")
     print(f"  HRatio={HRatio}, kvHead={kvHead}")
     print(f"  Performance: baseline={time_baseline:.6f}s, SOTA={time_sota:.6f}s (avg over {args.iterations} runs)")
-    print(f"  Compare(num_split_per_seq): {comp_pass}")
+    print(f"  Compare(kernel_info_signature): {comp_pass}")
     print("  kernel_info (SOTA summary):")
     print(f"    MNWs={summary['kernel_info_sota'].get('MNWs', [])}")
     print(f"    max_split_per_seq={summary['kernel_info_sota'].get('max_split_per_seq')}")
@@ -531,7 +535,7 @@ def main():
             f.write(
                 f"  Performance: baseline={time_baseline:.6f}s, SOTA={time_sota:.6f}s (avg over {args.iterations} runs)\n"
             )
-            f.write(f"  Compare(num_split_per_seq): {comp_pass}\n")
+            f.write(f"  Compare(kernel_info_signature): {comp_pass}\n")
 
     if args.schedule_output_file:
         # Match schedule_test.py output format (JSONL entries)
