@@ -20,6 +20,7 @@ from prefix_attn import (
     generate_tree_seqs,
 )
 from prefix_attn.data_class import KernelInfo
+from prefix_attn.data_class import create_seq_group
 from FastTree import (
     FastTreeParams,
     fasttree_decode,
@@ -28,13 +29,17 @@ from FastTree import (
     qkv_preparation,
 )
 
-def get_sm_count(device=0):
-    """返回指定 GPU 设备的 SM 数量"""
-    if torch.cuda.is_available():
-        props = torch.cuda.get_device_properties(device)
-        return props.multi_processor_count
-    else:
-        return None
+
+def load_json_allow_prefix(path: str) -> dict:
+    """兼容形如 '(WorkerDict ...) { ... }' 的前缀/拼接日志；从首个'{'起只解析第一个完整 JSON 对象。"""
+    with open(path, "r") as f:
+        text = f.read()
+    start = text.find("{")
+    if start == -1:
+        raise ValueError(f"Invalid JSON content in {path}: cannot find '{{'")
+    decoder = json.JSONDecoder()
+    obj, _end = decoder.raw_decode(text[start:])
+    return obj
 
 def Timer(func, iter):
     import numpy as np
@@ -736,6 +741,7 @@ def run_benchmark(
     nheads_q: int,
     nheads_kv: int,
     output_path: str,
+    rl_testcase_json: str = None,
     # pat_schedule: str = "baseline", # balance debug
     head_dim: int = 128,
     block_size: int = 32,
@@ -761,14 +767,38 @@ def run_benchmark(
     }
     
     try:
-        seq_group, num_blocks = generate_tree_seqs(tree, block_size)
-        baseline = [
-            "vllm-fa",
-            "pat",
-            "flashinfer",
-        ]
-        if int(tree[0]) == 1 and tree[1] == ",":
-            baseline.extend(["ra", "ra++", "cascade", "deft"])
+        if rl_testcase_json is not None:
+            rl = load_json_allow_prefix(rl_testcase_json)
+
+            seq_lens = list(map(int, rl["seq_lens"]))
+            block_tables_padded = rl["block_tables"]
+            # RL_testcase.json 的 block_tables 通常被 padding 到同一长度；按 seq_lens 截断恢复真实 blockinfo
+            block_tables = [
+                row[: (seq_lens[i] + block_size - 1) // block_size]
+                for i, row in enumerate(block_tables_padded)
+            ]
+
+            seq_group = create_seq_group(block_tables=block_tables, seq_lens=seq_lens, block_size=block_size)
+            num_blocks = int(rl.get("num_blocks_total", 0))
+            if num_blocks <= 0:
+                max_bid = max((max(r) for r in block_tables if len(r) > 0), default=0)
+                num_blocks = int(max_bid) + 1
+            else:
+                max_bid = max((max(r) for r in block_tables if len(r) > 0), default=0)
+                num_blocks = max(num_blocks, int(max_bid) + 1)
+
+            # RL 用例默认只跑 pat（包含 pat_baseline/pat_sota），避免 vllm-fa reference 带来的额外显存/耗时风险。
+            # 输出结构仍与 kernel_perf.json 既有格式一致：latencies 里有 pat_baseline/pat_sota，correctness 为空字典。
+            baseline = ["pat"]
+        else:
+            seq_group, num_blocks = generate_tree_seqs(tree, block_size)
+            baseline = [
+                "vllm-fa",
+                "pat",
+                "flashinfer",
+            ]
+            if int(tree[0]) == 1 and tree[1] == ",":
+                baseline.extend(["ra", "ra++", "cascade", "deft"])
  
         lats_std, corr_std = benchmark(
             seq_group,
@@ -785,7 +815,8 @@ def run_benchmark(
         )
  
         lats_ft, corr_ft = {}, {}
-        if nheads_q // nheads_kv in [1, 4, 16]:
+        # FastTree/DeFT/cascade 仅适用于 synthetic tree string（例如 '1,10_4096,416'）。
+        if rl_testcase_json is None and nheads_q // nheads_kv in [1, 4, 16]:
             lats_ft, corr_ft = ft_benchmark(
                 tree,
                 nheads_q,
@@ -800,7 +831,7 @@ def run_benchmark(
         lats_deft, corr_deft = {}, {}
         lats_cascade, corr_cascade = {}, {}
  
-        if int(tree[0]) == 1 and tree[1] == ",":
+        if rl_testcase_json is None and int(tree[0]) == 1 and tree[1] == ",":
             lats_deft, corr_deft = DeFT_benchmark(
                 tree, nheads_q, nheads_kv, head_dim, n_repeats, dtype, device
             )
@@ -868,7 +899,10 @@ def run_benchmark(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--tree", type=str)
+    parser.add_argument("--tree", type=str, default=None,
+                        help="Tree string for synthetic test case. Ignored if --rl_testcase_json is set.")
+    parser.add_argument("--rl_testcase_json", type=str, default=None,
+                        help="Path to RL_testcase.json containing {pid, seq_lens, block_tables, num_blocks_total}.")
     parser.add_argument("--nheads_q", type=int)
     parser.add_argument("--nheads_kv", type=int)
     parser.add_argument("--output_file", type=str)
@@ -886,11 +920,21 @@ if __name__ == "__main__":
     device = "cuda:1"
     seed = int(time.time())
 
+    tree_name = args.tree
+    if args.rl_testcase_json is not None and tree_name is None:
+        rl = load_json_allow_prefix(args.rl_testcase_json)
+        pid = rl.get("pid", "unknown")
+        tree_name = f"rl_pid_{pid}"
+
+    if tree_name is None:
+        raise ValueError("Either --tree or --rl_testcase_json must be provided.")
+
     run_benchmark(
-        args.tree,
+        tree_name,
         args.nheads_q,
         args.nheads_kv,
         args.output_file,
+        args.rl_testcase_json,
         # args.pat_schedule, # balance debug
         head_dim,
         block_size,

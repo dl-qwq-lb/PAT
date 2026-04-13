@@ -25,3 +25,8 @@ venv/
 # Optional: ignore logs and temporary files
 *.log
 *.tmp
+
+# Ignore Documents
+instructions/
+
+benchmark/.rl_cases/

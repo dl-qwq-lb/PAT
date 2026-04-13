@@ -7,6 +7,7 @@ import numpy as np
 import torch  
 import argparse
 import time
+import json
   
 from prefix_attn import generate_tree_seqs 
 from prefix_attn.prefix_tree import PrefixTree  
@@ -118,6 +119,18 @@ def measure_performance(func, *args, iterations=10):
   
     avg_time = sum(times) / len(times)  
     return avg_time
+
+
+def load_json_allow_prefix(path: str) -> Dict[str, Any]:
+    """兼容形如 '(WorkerDict ...) { ... }' 的前缀/拼接日志；从首个'{'起只解析第一个完整 JSON 对象。"""
+    with open(path, "r") as f:
+        text = f.read()
+    start = text.find("{")
+    if start == -1:
+        raise ValueError(f"Invalid JSON content in {path}: cannot find '{{'")
+    decoder = json.JSONDecoder()
+    obj, _end = decoder.raw_decode(text[start:])
+    return obj
 
 
 def compare_schedules(ki_cpp, ki_sota: KernelInfo, label: str = "") -> bool:  
@@ -257,7 +270,10 @@ def run_single_test_cpp_compare(name: str,
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run schedule tests for balancePack comparison.")
-    parser.add_argument("--tree", type=str, help="Tree string for test case (e.g., '1,10_4096,416')")
+    parser.add_argument("--tree", type=str, default=None,
+                        help="Tree string for synthetic test case (e.g., '1,10_4096,416'). Ignored if --rl_testcase_json is set.")
+    parser.add_argument("--rl_testcase_json", type=str, default=None,
+                        help="Path to RL_testcase.json containing {pid, seq_lens, block_tables, num_blocks_total}.")
     parser.add_argument("--nheads_q", type=int, default=32, help="Number of Q heads")
     parser.add_argument("--nheads_kv", type=int, default=8, help="Number of KV heads")
     parser.add_argument("--block_size", type=int, default=32, help="Block size")
@@ -265,13 +281,25 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    seq_group, _ = generate_tree_seqs(args.tree, args.block_size)
-    seq_lens = [seq.seqlen for seq in seq_group.sequences]
-    block_table = seqgroup_to_block_table(seq_group, args.block_size)
+    if args.rl_testcase_json is not None:
+        rl = load_json_allow_prefix(args.rl_testcase_json)
+
+        pid = rl.get("pid", "unknown")
+        tree_name = args.tree if args.tree is not None else f"rl_pid_{pid}"
+        seq_lens = list(map(int, rl["seq_lens"]))
+        # RL_testcase.json 通常是 padding 过的 block_tables，按 seq_lens 截断即可还原真实 blockinfo
+        block_table = unpad_block_table(rl["block_tables"], seq_lens, args.block_size)
+    else:
+        if args.tree is None:
+            raise ValueError("Either --tree or --rl_testcase_json must be provided.")
+        tree_name = args.tree
+        seq_group, _ = generate_tree_seqs(args.tree, args.block_size)
+        seq_lens = [seq.seqlen for seq in seq_group.sequences]
+        block_table = seqgroup_to_block_table(seq_group, args.block_size)
     HRatio = args.nheads_q // args.nheads_kv
     kvHead = args.nheads_kv
 
-    result = run_single_test_cpp_compare(f"tree_{args.tree}",
+    result = run_single_test_cpp_compare(f"tree_{tree_name}",
                                             seq_lens,
                                             block_table,
                                             args.block_size,
@@ -279,9 +307,8 @@ if __name__ == "__main__":
                                             kvHead)
 
     if args.output_file:
-        import json
         output_data = {
-            "tree": args.tree,
+            "tree": tree_name,
             "nheads_q": args.nheads_q,
             "nheads_kv": args.nheads_kv,
             "block_size": args.block_size,

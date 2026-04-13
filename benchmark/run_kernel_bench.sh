@@ -3,14 +3,14 @@
 export TORCH_CUDA_ARCH_LIST="8.0 9.0"
 
 TREES=(
-    # "1,10_4096,416"
-    # "1,256_256,32"
-    # "1,1024_2048,32"
-    # "1,2,64_1024,256,256"
-    # "1,4,256_32,256,32"
-    # "1,8,512_32,512,256"
-    # "1,8,512_32,2048,256"
-    # "1,8,512_512,512,256"
+    "1,10_4096,416"
+    "1,256_256,32"
+    "1,1024_2048,32"
+    "1,2,64_1024,256,256"
+    "1,4,256_32,256,32"
+    "1,8,512_32,512,256"
+    "1,8,512_32,2048,256"
+    "1,8,512_512,512,256"
     # "1,4,8,256_32,256,256,32"
     # "1,4,16,512_1024,256,128,32"
     # "1,4,16,64,256,1024_256,32,256,64,32,256"
@@ -24,11 +24,10 @@ TREES=(
     # "256_1024"
     # "256_4096"
 
-    "1,16_16384,32"
-    "1,2048_512,128"
-    "1,4,16,64_1024,512,256,128"
-    "1,32,128_256,4096,64"
-    "1,64,4096_128,128,128"
+    # "1,16_16384,32"
+    # "1,16_16384,128"
+    # "1,4,16_4096,256,32"
+
 )
 
 HEAD_CONFIGS=(
@@ -37,6 +36,10 @@ HEAD_CONFIGS=(
     "32 8"
     "64 8"
 )
+
+# RL testcases (optional; will run if file exists)
+RL_TESTCASE_FILE="RL_testcase.json"
+RL_CASE_DIR=".rl_cases"
 
 OUTPUT_FILE="kernel_perf.json"
 SCHEDULE_OUTPUT_FILE="schedule_perf.json"
@@ -69,6 +72,60 @@ for tree in "${TREES[@]}"; do
   done
 done
 
+# --- prepare RL cases (extract ALL json objects from RL_TESTCASE_FILE) ---
+RL_CASE_FILES=()
+if [[ -f "$RL_TESTCASE_FILE" ]]; then
+  rm -rf "$RL_CASE_DIR"
+  mkdir -p "$RL_CASE_DIR"
+
+  # Output format: <tree_name>\t<case_json_path>
+  mapfile -t RL_CASE_FILES < <(
+    python - <<'PY'
+import json
+import os
+from json import JSONDecoder
+from json.decoder import JSONDecodeError
+
+rl_path = os.environ.get('RL_TESTCASE_FILE', 'RL_testcase.json')
+out_dir = os.environ.get('RL_CASE_DIR', '.rl_cases')
+
+with open(rl_path, 'r') as f:
+    text = f.read()
+
+decoder = JSONDecoder()
+i = 0
+idx = 0
+while True:
+    start = text.find('{', i)
+    if start == -1:
+        break
+    try:
+        obj, end = decoder.raw_decode(text[start:])
+    except JSONDecodeError:
+        i = start + 1
+        continue
+
+    # keep only valid RL testcase dicts
+    if isinstance(obj, dict) and ('seq_lens' in obj) and ('block_tables' in obj):
+        pid = obj.get('pid', 'unknown')
+        tree_name = f"rl_case_{idx:04d}_pid_{pid}"
+        out_path = os.path.join(out_dir, f"{tree_name}.json")
+        with open(out_path, 'w') as wf:
+            json.dump(obj, wf)
+        print(f"{tree_name}\t{out_path}")
+        idx += 1
+
+    i = start + end
+
+PY
+  )
+
+  RL_COUNT=${#RL_CASE_FILES[@]}
+  if [[ "$RL_COUNT" -gt 0 ]]; then
+    TOTAL=$((TOTAL + RL_COUNT * ${#HEAD_CONFIGS[@]}))
+  fi
+fi
+
 CUR=0
 for tree in "${TREES[@]}"; do
   for config in "${HEAD_CONFIGS[@]}"; do
@@ -87,46 +144,24 @@ for tree in "${TREES[@]}"; do
   done
 done
 
-# ---------------- RL testcase integration ----------------
-# RL_testcase.json contains concatenated JSON records (with log prefixes). We reuse HEAD_CONFIGS
-# and run scheduling-only benchmarks that append into the same three output files:
-#   - kernel_perf.json      (JSON array; we append a schedule-only entry)
-#   - schedule_perf.json    (JSONL; we append one line per RL case)
-#   - schedule.log          (text; we append human-readable summary)
+# --- RL testcases loop ---
+if [[ ${#RL_CASE_FILES[@]} -gt 0 ]]; then
+  for entry in "${RL_CASE_FILES[@]}"; do
+    IFS=$'\t' read -r rl_tree rl_path <<< "$entry"
+    for config in "${HEAD_CONFIGS[@]}"; do
+      CUR=$((CUR+1))
 
-RL_TESTCASE_PATH=${RL_TESTCASE_PATH:-"RL_testcase.json"}
-RL_INDICES=${RL_INDICES:-"0 1 2 3"}   # space-separated indices, e.g. "0 1 2"
-RL_ITERS=${RL_ITERS:-10}
-RL_WARMUP=${RL_WARMUP:-3}
+      read -r hq hkv <<< "$config"
+      extra="rl_tree=${rl_tree} config=(nh_q:${hq},nh_kv:${hkv})"
+      progress_bar "$CUR" "$TOTAL" " $extra"
 
-# for rl_idx in $RL_INDICES; do
-#   for config in "${HEAD_CONFIGS[@]}"; do
-#     read -r hq hkv <<< "$config"
-#     echo -e "\n[RL] idx=${rl_idx} config=(nh_q:${hq},nh_kv:${hkv})" >> "$SCHEDULE_LOG_FILE"
+      # GPU kernel benchmark -> kernel_perf.json (PAT baseline+sota inside)
+      python benchmark_kernel.py --tree "$rl_tree" --rl_testcase_json "$rl_path" --nheads_q "$hq" --nheads_kv "$hkv" --output_file "$OUTPUT_FILE" > kernel.log 2>&1
 
-#     EXTRA_RL_ARGS=()
-#     if [[ -n "${RL_DEBUG_DIR}" ]]; then
-#       mkdir -p "${RL_DEBUG_DIR}"
-#       EXTRA_RL_ARGS+=(
-#         --dump_tree_json "${RL_DEBUG_DIR}/rl_tree_idx${rl_idx}_hq${hq}_hkv${hkv}.json"
-#         --dump_kernel_info_json "${RL_DEBUG_DIR}/rl_kernel_info_idx${rl_idx}_hq${hq}_hkv${hkv}.json"
-#         --dump_kernel_info_max_ctas "${RL_DEBUG_MAX_CTAS:-0}"
-#       )
-#     fi
-
-#     python ./run_rl_testcase.py \
-#       --path "$RL_TESTCASE_PATH" \
-#       --index "$rl_idx" \
-#       --nheads_q "$hq" \
-#       --nheads_kv "$hkv" \
-#       --iterations "$RL_ITERS" \
-#       --warmup "$RL_WARMUP" \
-#       --kernel_output_file "$OUTPUT_FILE" \
-#       --schedule_output_file "$SCHEDULE_OUTPUT_FILE" \
-#       --schedule_log_file "$SCHEDULE_LOG_FILE" \
-#       "${EXTRA_RL_ARGS[@]}" \
-#       >> "$SCHEDULE_LOG_FILE" 2>&1
-#   done
-# done
+      # CPU schedule benchmark -> schedule_perf.json + detailed kernel_info -> schedule.log
+      python ./schedule_test.py --tree "$rl_tree" --rl_testcase_json "$rl_path" --nheads_q "$hq" --nheads_kv "$hkv" --block_size 32 --output_file "$SCHEDULE_OUTPUT_FILE" >> schedule.log 2>&1
+    done
+  done
+fi
 
 echo -e "\nDone."
