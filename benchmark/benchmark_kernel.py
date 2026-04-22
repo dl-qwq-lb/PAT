@@ -917,7 +917,7 @@ if __name__ == "__main__":
     block_size = 32
     n_repeats = 20
     dtype = torch.float16
-    device = "cuda:1"
+    device = "cuda:0"
     seed = int(time.time())
 
     tree_name = args.tree

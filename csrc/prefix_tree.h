@@ -679,22 +679,14 @@ private:
         return cached_max_cta;
     }
 
-    static double _bp_getenv_double_nonneg(const char* name, double default_val) {
-        const char* s = std::getenv(name);
-        if (!s || !*s) return default_val;
-
-        char* end = nullptr;
-        const double v = std::strtod(s, &end);
-        if (end == s) return default_val;
-        if (!(v >= 0.0)) return default_val;
-        return v;
-    }
-
     struct _bp_cost_model {
         int HR = 1;
         static constexpr double a = 0.1;
         static constexpr double b = 0.1;
         static constexpr double c = 2.0;
+
+        static constexpr double Q_DUP = 0.25 * a;
+        static constexpr double Q_GQH = 0.10 * a;
 
         double operator()(int q_tokens, int kv_tokens) const {
             return a * (double)q_tokens * (double)HR + b * (double)kv_tokens + c * (double)q_tokens * (double)kv_tokens * (double)HR;
@@ -835,18 +827,14 @@ private:
             const double est_time_after = (double)waves_after * new_max_cost;
             const double makespan_gain = est_time_before - est_time_after;
 
-            // 估计 split 固定开销（与 @cap 分支保持一致的形式）：
-            //   overhead ~= q-dup + gather(partial) + launch
+            // 估计 split 固定开销：
+            //   overhead ~= q-dup + gather(partial)
             // 这里每次二分只新增 1 个 CTA。
             const int HR = std::max(1, HRatio);
             const double qh = (double)q * (double)HR;
-            const double q_dup_coeff = _bp_getenv_double_nonneg(
-                "PAT_SPLIT_QDUP_COEFF",
-                _bp_cost_model::a * 0.25);
-            const double g_base = _bp_getenv_double_nonneg("PAT_GATHER_KERNEL_BASE_COST", 0.0);
-            const double g_qh = _bp_getenv_double_nonneg("PAT_GATHER_KERNEL_QH_COEFF", _bp_cost_model::a * 0.10);
-            const double launch_cost = _bp_getenv_double_nonneg("PAT_SPLIT_CTA_LAUNCH_COST", 0.0);
-            const double overhead = (q_dup_coeff * qh) + (g_base + g_qh * qh) + launch_cost;
+            const double q_dup_coeff = _bp_cost_model::Q_DUP;
+            const double g_qh = _bp_cost_model::Q_GQH;
+            const double overhead = (q_dup_coeff * qh) + (g_qh * qh);
 
             if (makespan_gain > overhead) return makespan_gain - overhead;
             if (waves_after == waves_before && is_bottleneck_cta && piece_cost < old_cost) {
@@ -907,16 +895,10 @@ private:
 
 public:
 
-    std::vector<PackedBox> balancePackSota(std::vector<PackedBox> boxes,
-                                           int kvHead,
-                                           int HRatio = 1) {
-        const bool enable_debug = (std::getenv("PAT_DEBUG_IMBALANCE") != nullptr);
-
-        if (boxes.empty()) return {};
-
+    std::vector<PackedBox> balancePackSota(std::vector<PackedBox> boxes, int kvHead, int HRatio = 1) {
         // NOTE: 使用 move 语义避免深拷贝。
         std::vector<PackedBox> crop = std::move(boxes);
-        if (crop.empty()) return crop;
+        if (crop.empty()) return {};
 
         const int base_cta = (int)crop.size();
 
@@ -937,7 +919,6 @@ public:
         int cur_max_split = 0;
         for (int v : split_per_seq) if (v > cur_max_split) cur_max_split = v;
 
-
         const _bp_cost_model cost_fn{.HR = std::max(1, HRatio)};
 
         if (base_cta >= cta_limit) {
@@ -952,55 +933,12 @@ public:
             if (batch_min_kv == INT_MAX) batch_min_kv = 1;
             const int min_kv_tokens_per_piece = std::max(min_blocks_per_piece * block_size, batch_min_kv);
 
-            // 不均衡度量（基于当前 crop 的 per-CTA cost）
-            double sum_cost = 0.0;
-            double max_cost = 0.0;
-            double second_max_cost = 0.0;
-            int max_cost_count = 0;
-            for (const auto& b : crop) {
-                const int q = std::max(0, (int)b.q_table.size());
-                const int kv = std::max(0, b.kv_in_CTA);
-                const double cst = original_cost(q, H, kv);
-                sum_cost += cst;
-                if (cst > max_cost) {
-                    second_max_cost = max_cost;
-                    max_cost = cst;
-                    max_cost_count = 1;
-                } else if (cst > second_max_cost) {
-                    second_max_cost = cst;
-                    if (cst == max_cost) {
-                        max_cost_count += 1;
-                    }
-                } else if (cst == max_cost) {
-                    max_cost_count += 1;
-                }
-            }
-            const double avg_cost = (crop.empty() ? 0.0 : (sum_cost / (double)crop.size()));
-            const double imbalance = (avg_cost > 0.0 ? (max_cost / avg_cost) : 0.0);
-
-            // if (enable_debug) {
-            //     std::cout << "[balancePackSota@cap] kvHead=" << kvHead
-            //               << " HRatio=" << HRatio
-            //               << " base_cta=" << base_cta
-            //               << " cta_limit=" << cta_limit
-            //               << " max/avg=" << imbalance
-            //               << " max_cost=" << max_cost
-            //               << " avg_cost=" << avg_cost
-            //               << " max_idx=" << max_cost_idx
-            //               << std::endl;
-            // }
-
-            // Stage 1: 全局贪心 split 动作（每轮选一个最优 split 并立即应用）
+            // Stage 1: 全局贪心 split 动作
             const int HR = std::max(1, HRatio);
             const int denom = std::max(1, (cta_cap > 0 ? cta_cap : cta_limit));
 
-            // 固定开销参数（从 env 读取一次）
-            const double q_dup_coeff = _bp_getenv_double_nonneg(
-                "PAT_SPLIT_QDUP_COEFF",
-                _bp_cost_model::a * 0.25);
-            const double g_base = _bp_getenv_double_nonneg("PAT_GATHER_KERNEL_BASE_COST", 0.0);
-            const double g_qh = _bp_getenv_double_nonneg("PAT_GATHER_KERNEL_QH_COEFF", _bp_cost_model::a * 0.10);
-            const double cta_launch_cost = _bp_getenv_double_nonneg("PAT_SPLIT_CTA_LAUNCH_COST", 0.0);
+            const double q_dup_coeff = _bp_cost_model::Q_DUP;
+            const double g_qh = _bp_cost_model::Q_GQH;
 
             auto recompute_cost_stats = [&](const std::vector<PackedBox>& v,
                                             double& sum_cost_out,
@@ -1115,10 +1053,9 @@ public:
 
                         // kv_pad 保守为 0
                         const double fixed_overhead = (double)added_cta * (q_dup_coeff * qh);
-                        const double gather_overhead = (double)added_cta * (g_base + g_qh * qh);
-                        const double launch_overhead = (double)added_cta * cta_launch_cost;
+                        const double gather_overhead = (double)added_cta * (g_qh * qh);
 
-                        const double net_gain = makespan_benefit - (fixed_overhead + gather_overhead + launch_overhead);
+                        const double net_gain = makespan_benefit - (fixed_overhead + gather_overhead);
                         if (net_gain > best_gain) {
                             best_gain = net_gain;
                             best_i = (int)i;
@@ -1145,17 +1082,9 @@ public:
                 total_cta += (int)pieces.size() - 1;
                 applied_actions += 1;
             }
-
-            if (enable_debug) {
-                std::cout << "[balancePackSota@cap] greedy_actions=" << applied_actions
-                          << " final_cta=" << (int)crop.size()
-                          << std::endl;
-            }
             return crop;
         }
-        // 恢复全局 L_kv 模式：
-        //   L_kv = ceil(sum(tile.kv_len) / cta_limit)
-        // 其中 tile 等价于 _tree_heuristics 输出的 PackedBox（已经按 query tile 粒度展开）。
+ 
         long long total_kv_all = 0;
         int batch_min_kv = INT_MAX;
         for (const auto& b : crop) {
@@ -1170,12 +1099,8 @@ public:
         }
 
         const int global_L_kv = std::max(1, (int)std::ceil((double)std::max(1LL, total_kv_all) / (double)cta_limit));
-        // 不切出比当前 batch 已存在的最小片段更短的新片段（避免 schedule 侧碎片化纯开销）。
         const int effective_L_kv = std::max(global_L_kv, batch_min_kv);
 
-        // 预算分配（你提到的“CTA 不够时平均/按比例分割”）：
-        // 1) 先用 L_kv 计算每个 box 的 desired_i = ceil(kv_i / L_kv)
-        // 2) 若 sum(desired_i) > cta_limit，则把“额外 split 预算”按 need_i 比例缩放回退。
         const int extra_budget_total = cta_limit - base_cta;
         if (extra_budget_total <= 0) {
             return crop;
@@ -1247,14 +1172,14 @@ public:
         std::vector<PackedBox> out;
         out.reserve((size_t)cta_limit);
 
+        const int min_blocks_per_piece = 4;
+        const int min_kv_tokens_per_piece = std::max(min_blocks_per_piece * block_size, batch_min_kv);
+
         for (size_t i = 0; i < crop.size(); ++i) {
             PackedBox b = std::move(crop[i]);
 
             int split_k = 1 + extra_alloc[i];
 
-            // 避免短尾巴：保证每段至少有一定 block 数 / kv token 数，否则减少 split_k。
-            const int min_blocks_per_piece = 4;
-            const int min_kv_tokens_per_piece = std::max(min_blocks_per_piece * block_size, batch_min_kv);
             if (b.block_table_ptr) {
                 int total_blocks = (int)b.block_table_ptr->size();
                 while (split_k > 1 && (total_blocks + split_k - 1) / split_k < min_blocks_per_piece) {
@@ -1265,7 +1190,6 @@ public:
                 split_k--;
             }
 
-            // 保持 split_per_seq 上限：若已达到上限，退化为不拆分
             if (cur_max_split >= 32) {
                 split_k = 1;
             }
@@ -1273,10 +1197,6 @@ public:
             _bp_split_box_even_blocks(std::move(b), split_k, out, min_kv_tokens_per_piece, cur_max_split);
             if ((int)out.size() >= cta_limit) break;
         }
-
-        // L_kv 分割完成后，仍可能因为短尾回退导致 CTA 未用满。
-        // 在 base_cta < cta_limit 分支中（CTA 充足），按“计算量成本模型”继续细分以降低估计 makespan。
-        // NOTE: 这里不计拆分冗余（不加 q_dup/kv_pad 等固定开销），仅看并行后的 makespan 改善。
         _bp_refine_with_spare_cta(out, cta_limit, cta_cap, HRatio, sum_need, extra_budget_total, cur_max_split);
 
         return out;
