@@ -25,3 +25,5 @@ venv/
 # Optional: ignore logs and temporary files
 *.log
 *.tmp
+
+instructions/
