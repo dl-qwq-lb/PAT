@@ -30,5 +30,6 @@ venv/
 instructions/
 
 benchmark/.rl_cases/
+benchmark/RLtest/
 
 .vscode/
