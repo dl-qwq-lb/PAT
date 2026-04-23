@@ -5,14 +5,13 @@
         "nheads_kv": 32,
         "head_dim": 128,
         "block_size": 32,
-        "latencies": {},
+        "latencies": {
+            "pat_baseline": 0.9914239943027496,
+            "pat_sota": 0.9312959909439087
+        },
         "correctness": {},
-        "status": "failed",
-        "error": {
-            "type": "OutOfMemoryError",
-            "message": "CUDA out of memory. Tried to allocate 1.65 GiB. GPU 0 has a total capacity of 47.50 GiB of which 891.12 MiB is free. Process 2161224 has 46.24 GiB memory in use. Process 3302622 has 388.00 MiB memory in use. Of the allocated memory 1024.00 KiB is allocated by PyTorch, and 1024.00 KiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)",
-            "traceback": "Traceback (most recent call last):\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 803, in run_benchmark\n    lats_std, corr_std = benchmark(\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 118, in benchmark\n    ) = generate_random_kv_cache(\n  File \"/usr/local/lib/python3.10/dist-packages/prefix_attn/utils.py\", line 32, in generate_random_kv_cache\n    k_cache_paged = torch.randn(num_blocks, block_size, nheads_kv, head_dim, dtype=dtype, device=device)\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.65 GiB. GPU 0 has a total capacity of 47.50 GiB of which 891.12 MiB is free. Process 2161224 has 46.24 GiB memory in use. Process 3302622 has 388.00 MiB memory in use. Of the allocated memory 1024.00 KiB is allocated by PyTorch, and 1024.00 KiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
-        }
+        "status": "success",
+        "error": null
     },
     {
         "tree": "rl_case_0000_pid_1955100",
@@ -20,14 +19,13 @@
         "nheads_kv": 8,
         "head_dim": 128,
         "block_size": 32,
-        "latencies": {},
+        "latencies": {
+            "pat_baseline": 0.3505440056324005,
+            "pat_sota": 0.2807519882917404
+        },
         "correctness": {},
-        "status": "failed",
-        "error": {
-            "type": "RuntimeError",
-            "message": "CUDA error: out of memory\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\n",
-            "traceback": "Traceback (most recent call last):\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 803, in run_benchmark\n    lats_std, corr_std = benchmark(\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 118, in benchmark\n    ) = generate_random_kv_cache(\n  File \"/usr/local/lib/python3.10/dist-packages/prefix_attn/utils.py\", line 35, in generate_random_kv_cache\n    k_cache = k_cache_paged[block_table]  # (batch_size, num_blocks, block_size, nheads_kv, head_dim)\nRuntimeError: CUDA error: out of memory\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\n\n"
-        }
+        "status": "success",
+        "error": null
     },
     {
         "tree": "rl_case_0000_pid_1955100",
@@ -35,14 +33,13 @@
         "nheads_kv": 8,
         "head_dim": 128,
         "block_size": 32,
-        "latencies": {},
+        "latencies": {
+            "pat_baseline": 0.35787199437618256,
+            "pat_sota": 0.29235199093818665
+        },
         "correctness": {},
-        "status": "failed",
-        "error": {
-            "type": "RuntimeError",
-            "message": "CUDA error: out of memory\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\n",
-            "traceback": "Traceback (most recent call last):\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 803, in run_benchmark\n    lats_std, corr_std = benchmark(\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 118, in benchmark\n    ) = generate_random_kv_cache(\n  File \"/usr/local/lib/python3.10/dist-packages/prefix_attn/utils.py\", line 35, in generate_random_kv_cache\n    k_cache = k_cache_paged[block_table]  # (batch_size, num_blocks, block_size, nheads_kv, head_dim)\nRuntimeError: CUDA error: out of memory\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\n\n"
-        }
+        "status": "success",
+        "error": null
     },
     {
         "tree": "rl_case_0000_pid_1955100",
@@ -50,14 +47,13 @@
         "nheads_kv": 8,
         "head_dim": 128,
         "block_size": 32,
-        "latencies": {},
+        "latencies": {
+            "pat_baseline": 0.374783992767334,
+            "pat_sota": 0.30798400938510895
+        },
         "correctness": {},
-        "status": "failed",
-        "error": {
-            "type": "RuntimeError",
-            "message": "CUDA error: out of memory\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\n",
-            "traceback": "Traceback (most recent call last):\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 803, in run_benchmark\n    lats_std, corr_std = benchmark(\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 118, in benchmark\n    ) = generate_random_kv_cache(\n  File \"/usr/local/lib/python3.10/dist-packages/prefix_attn/utils.py\", line 35, in generate_random_kv_cache\n    k_cache = k_cache_paged[block_table]  # (batch_size, num_blocks, block_size, nheads_kv, head_dim)\nRuntimeError: CUDA error: out of memory\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\n\n"
-        }
+        "status": "success",
+        "error": null
     },
     {
         "tree": "rl_case_0001_pid_1954796",
@@ -65,14 +61,13 @@
         "nheads_kv": 32,
         "head_dim": 128,
         "block_size": 32,
-        "latencies": {},
+        "latencies": {
+            "pat_baseline": 0.8714240193367004,
+            "pat_sota": 0.8630400002002716
+        },
         "correctness": {},
-        "status": "failed",
-        "error": {
-            "type": "OutOfMemoryError",
-            "message": "CUDA out of memory. Tried to allocate 1.65 GiB. GPU 0 has a total capacity of 47.50 GiB of which 891.12 MiB is free. Process 2161224 has 46.24 GiB memory in use. Process 3306626 has 388.00 MiB memory in use. Of the allocated memory 1024.00 KiB is allocated by PyTorch, and 1024.00 KiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)",
-            "traceback": "Traceback (most recent call last):\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 803, in run_benchmark\n    lats_std, corr_std = benchmark(\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 118, in benchmark\n    ) = generate_random_kv_cache(\n  File \"/usr/local/lib/python3.10/dist-packages/prefix_attn/utils.py\", line 32, in generate_random_kv_cache\n    k_cache_paged = torch.randn(num_blocks, block_size, nheads_kv, head_dim, dtype=dtype, device=device)\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.65 GiB. GPU 0 has a total capacity of 47.50 GiB of which 891.12 MiB is free. Process 2161224 has 46.24 GiB memory in use. Process 3306626 has 388.00 MiB memory in use. Of the allocated memory 1024.00 KiB is allocated by PyTorch, and 1024.00 KiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
-        }
+        "status": "success",
+        "error": null
     },
     {
         "tree": "rl_case_0001_pid_1954796",
@@ -80,13 +75,152 @@
         "nheads_kv": 8,
         "head_dim": 128,
         "block_size": 32,
-        "latencies": {},
+        "latencies": {
+            "pat_baseline": 0.2965119928121567,
+            "pat_sota": 0.25548800826072693
+        },
         "correctness": {},
-        "status": "failed",
-        "error": {
-            "type": "RuntimeError",
-            "message": "CUDA error: out of memory\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\n",
-            "traceback": "Traceback (most recent call last):\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 803, in run_benchmark\n    lats_std, corr_std = benchmark(\n  File \"/workspace/PAT/benchmark/benchmark_kernel.py\", line 118, in benchmark\n    ) = generate_random_kv_cache(\n  File \"/usr/local/lib/python3.10/dist-packages/prefix_attn/utils.py\", line 35, in generate_random_kv_cache\n    k_cache = k_cache_paged[block_table]  # (batch_size, num_blocks, block_size, nheads_kv, head_dim)\nRuntimeError: CUDA error: out of memory\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\n\n"
-        }
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "rl_case_0001_pid_1954796",
+        "nheads_q": 32,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "pat_baseline": 0.3041279911994934,
+            "pat_sota": 0.26790399849414825
+        },
+        "correctness": {},
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "rl_case_0001_pid_1954796",
+        "nheads_q": 64,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "pat_baseline": 0.3266560137271881,
+            "pat_sota": 0.2844640016555786
+        },
+        "correctness": {},
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "rl_case_0002_pid_1954796",
+        "nheads_q": 32,
+        "nheads_kv": 32,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "pat_baseline": 0.8700160086154938,
+            "pat_sota": 0.866896003484726
+        },
+        "correctness": {},
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "rl_case_0002_pid_1954796",
+        "nheads_q": 16,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "pat_baseline": 0.29286399483680725,
+            "pat_sota": 0.25355200469493866
+        },
+        "correctness": {},
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "rl_case_0002_pid_1954796",
+        "nheads_q": 32,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "pat_baseline": 0.30403199791908264,
+            "pat_sota": 0.2672640085220337
+        },
+        "correctness": {},
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "rl_case_0002_pid_1954796",
+        "nheads_q": 64,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "pat_baseline": 0.32315200567245483,
+            "pat_sota": 0.285631999373436
+        },
+        "correctness": {},
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "rl_case_0003_pid_1954796",
+        "nheads_q": 32,
+        "nheads_kv": 32,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "pat_baseline": 0.8651839792728424,
+            "pat_sota": 0.8642880022525787
+        },
+        "correctness": {},
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "rl_case_0003_pid_1954796",
+        "nheads_q": 16,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "pat_baseline": 0.2938559949398041,
+            "pat_sota": 0.2549760043621063
+        },
+        "correctness": {},
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "rl_case_0003_pid_1954796",
+        "nheads_q": 32,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "pat_baseline": 0.3051519989967346,
+            "pat_sota": 0.269679993391037
+        },
+        "correctness": {},
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "rl_case_0003_pid_1954796",
+        "nheads_q": 64,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "pat_baseline": 0.3245919942855835,
+            "pat_sota": 0.2840159982442856
+        },
+        "correctness": {},
+        "status": "success",
+        "error": null
     }
 ]

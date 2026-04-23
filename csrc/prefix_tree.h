@@ -685,9 +685,6 @@ private:
         static constexpr double b = 0.1;
         static constexpr double c = 2.0;
 
-        static constexpr double Q_DUP = 0.25 * a;
-        static constexpr double Q_GQH = 0.10 * a;
-
         double operator()(int q_tokens, int kv_tokens) const {
             return a * (double)q_tokens * (double)HR + b * (double)kv_tokens + c * (double)q_tokens * (double)kv_tokens * (double)HR;
         }
@@ -820,25 +817,19 @@ private:
             const int waves_after = ((int)out.size() + 1 + denom - 1) / denom;
 
             const int kv_piece = std::max(min_kv_tokens_per_piece, ceil_div(kv, 2));
-            const double piece_cost = cost_fn(q, kv_piece);
-            const double new_max_cost = std::max(max_cost_others, piece_cost);
+            // 隐式拆分代价：每多 1 个 CTA，会重复执行一次 Q 侧线性项。
+            // 这里不再显式扣除 overhead，从而减少超参数与分支逻辑。
+            const double dup_q_cost = _bp_cost_model::a * (double)q * (double)HRatio;
+            const double piece_cost_eff = cost_fn(q, kv_piece) + dup_q_cost;
+            const double new_max_cost = std::max(max_cost_others, piece_cost_eff);
 
             const double est_time_before = (double)waves_before * max_cost;
             const double est_time_after = (double)waves_after * new_max_cost;
             const double makespan_gain = est_time_before - est_time_after;
 
-            // 估计 split 固定开销：
-            //   overhead ~= q-dup + gather(partial)
-            // 这里每次二分只新增 1 个 CTA。
-            const int HR = std::max(1, HRatio);
-            const double qh = (double)q * (double)HR;
-            const double q_dup_coeff = _bp_cost_model::Q_DUP;
-            const double g_qh = _bp_cost_model::Q_GQH;
-            const double overhead = (q_dup_coeff * qh) + (g_qh * qh);
-
-            if (makespan_gain > overhead) return makespan_gain - overhead;
-            if (waves_after == waves_before && is_bottleneck_cta && piece_cost < old_cost) {
-                const double shape_gain = (old_cost - piece_cost) - overhead;
+            if (makespan_gain > 0.0) return makespan_gain;
+            if (waves_after == waves_before && is_bottleneck_cta && piece_cost_eff < old_cost) {
+                const double shape_gain = (old_cost - piece_cost_eff);
                 if (shape_gain > 0.0) return 1e-9 + shape_gain;
             }
             return 0.0;
@@ -937,9 +928,6 @@ public:
             const int HR = std::max(1, HRatio);
             const int denom = std::max(1, (cta_cap > 0 ? cta_cap : cta_limit));
 
-            const double q_dup_coeff = _bp_cost_model::Q_DUP;
-            const double g_qh = _bp_cost_model::Q_GQH;
-
             auto recompute_cost_stats = [&](const std::vector<PackedBox>& v,
                                             double& sum_cost_out,
                                             double& max_cost_out,
@@ -1028,8 +1016,6 @@ public:
                         return true;
                     };
 
-                    const double qh = (double)q * (double)HR;
-
                     for (int k : cand_k) {
                         if (k > max_k) continue;
                         if (!can_split_k(k)) continue;
@@ -1043,21 +1029,17 @@ public:
                         const int kv_last = std::max(0, kv - (k - 1) * kv_piece_aligned);
                         const int kv_piece_max = std::max(kv_piece_aligned, kv_last);
 
-                        const double split_cta_cost = cost_fn(q, kv_piece_max);
-                        const double new_max_cost = std::max(max_cost_others, split_cta_cost);
+                        // 隐式拆分代价：新增 CTA 会重复执行 Q 侧线性项。
+                        // 将其并入 split 后瓶颈 CTA 的等效 cost，可避免单独的 overhead 代码块。
+                        const double dup_q_cost = _bp_cost_model::a * (double)q * (double)HR;
+                        const double split_cta_cost_eff = cost_fn(q, kv_piece_max) + (double)added_cta * dup_q_cost;
+                        const double new_max_cost = std::max(max_cost_others, split_cta_cost_eff);
 
                         const double est_time_before = (double)waves_before * max_cost_it;
                         const double est_time_after  = (double)waves_after  * new_max_cost;
-                        const double makespan_benefit = est_time_before - est_time_after;
-                        if (makespan_benefit <= 0.0) continue;
-
-                        // kv_pad 保守为 0
-                        const double fixed_overhead = (double)added_cta * (q_dup_coeff * qh);
-                        const double gather_overhead = (double)added_cta * (g_qh * qh);
-
-                        const double net_gain = makespan_benefit - (fixed_overhead + gather_overhead);
-                        if (net_gain > best_gain) {
-                            best_gain = net_gain;
+                        const double gain = est_time_before - est_time_after;
+                        if (gain > best_gain) {
+                            best_gain = gain;
                             best_i = (int)i;
                             best_k = k;
                         }
