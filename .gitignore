@@ -30,3 +30,5 @@ venv/
 instructions/
 
 benchmark/.rl_cases/
+
+.vscode/

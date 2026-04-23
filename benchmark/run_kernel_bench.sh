@@ -24,9 +24,9 @@ TREES=(
     # "256_1024"
     # "256_4096"
 
-    # "1,16_16384,32"
-    # "1,16_16384,128"
-    # "1,4,16_4096,256,32"
+    "1,16_16384,32"
+    "1,16_16384,128"
+    "1,4,16_4096,256,32"
 
 )
 
@@ -45,8 +45,8 @@ OUTPUT_FILE="kernel_perf.json"
 SCHEDULE_OUTPUT_FILE="schedule_perf.json"
 SCHEDULE_LOG_FILE="schedule.log"
 
-rm -f $OUTPUT_FILE
-rm -f $SCHEDULE_OUTPUT_FILE
+# rm -f $OUTPUT_FILE
+# rm -f $SCHEDULE_OUTPUT_FILE
 rm -f $SCHEDULE_LOG_FILE
 
 # --- progress bar helpers ---
@@ -156,10 +156,10 @@ if [[ ${#RL_CASE_FILES[@]} -gt 0 ]]; then
       progress_bar "$CUR" "$TOTAL" " $extra"
 
       # GPU kernel benchmark -> kernel_perf.json (PAT baseline+sota inside)
-      python benchmark_kernel.py --tree "$rl_tree" --rl_testcase_json "$rl_path" --nheads_q "$hq" --nheads_kv "$hkv" --output_file "$OUTPUT_FILE" > kernel.log 2>&1
+      # python benchmark_kernel.py --tree "$rl_tree" --rl_testcase_json "$rl_path" --nheads_q "$hq" --nheads_kv "$hkv" --output_file "$OUTPUT_FILE" > kernel.log 2>&1
 
       # CPU schedule benchmark -> schedule_perf.json + detailed kernel_info -> schedule.log
-      python ./schedule_test.py --tree "$rl_tree" --rl_testcase_json "$rl_path" --nheads_q "$hq" --nheads_kv "$hkv" --block_size 32 --output_file "$SCHEDULE_OUTPUT_FILE" >> schedule.log 2>&1
+      # python ./schedule_test.py --tree "$rl_tree" --rl_testcase_json "$rl_path" --nheads_q "$hq" --nheads_kv "$hkv" --block_size 32 --output_file "$SCHEDULE_OUTPUT_FILE" >> schedule.log 2>&1
     done
   done
 fi
