@@ -660,8 +660,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_baseline": 0.9876320064067841,
-            "pat_sota": 0.9268800020217896
+            "pat_baseline": 0.9885279834270477,
+            "pat_sota": 0.9271680116653442
         },
         "correctness": {},
         "status": "success",
@@ -674,8 +674,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_baseline": 0.35020801424980164,
-            "pat_sota": 0.28140799701213837
+            "pat_baseline": 0.3492799997329712,
+            "pat_sota": 0.28172799944877625
         },
         "correctness": {},
         "status": "success",
@@ -688,8 +688,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_baseline": 0.3583519905805588,
-            "pat_sota": 0.2916000038385391
+            "pat_baseline": 0.35521599650382996,
+            "pat_sota": 0.29131200909614563
         },
         "correctness": {},
         "status": "success",
@@ -702,8 +702,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_baseline": 0.374783992767334,
-            "pat_sota": 0.30771200358867645
+            "pat_baseline": 0.37785598635673523,
+            "pat_sota": 0.30959999561309814
         },
         "correctness": {},
         "status": "success",
@@ -716,8 +716,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_baseline": 0.873551994562149,
-            "pat_sota": 0.8643679916858673
+            "pat_baseline": 0.8686879873275757,
+            "pat_sota": 0.8626720011234283
         },
         "correctness": {},
         "status": "success",
@@ -730,8 +730,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_baseline": 0.29440000653266907,
-            "pat_sota": 0.2532320022583008
+            "pat_baseline": 0.29686400294303894,
+            "pat_sota": 0.2549760043621063
         },
         "correctness": {},
         "status": "success",
@@ -744,8 +744,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_baseline": 0.3039200007915497,
-            "pat_sota": 0.26814401149749756
+            "pat_baseline": 0.3025440126657486,
+            "pat_sota": 0.2666400074958801
         },
         "correctness": {},
         "status": "success",
@@ -758,8 +758,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_baseline": 0.32199999690055847,
-            "pat_sota": 0.28308799862861633
+            "pat_baseline": 0.3213919997215271,
+            "pat_sota": 0.2804799973964691
         },
         "correctness": {},
         "status": "success",
@@ -772,8 +772,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_baseline": 0.8679839968681335,
-            "pat_sota": 0.8636640012264252
+            "pat_baseline": 0.8673119843006134,
+            "pat_sota": 0.8619519770145416
         },
         "correctness": {},
         "status": "success",
@@ -786,8 +786,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_baseline": 0.29494400322437286,
-            "pat_sota": 0.2540159970521927
+            "pat_baseline": 0.29705600440502167,
+            "pat_sota": 0.25804799795150757
         },
         "correctness": {},
         "status": "success",
@@ -800,8 +800,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_baseline": 0.3051519989967346,
-            "pat_sota": 0.2688000053167343
+            "pat_baseline": 0.30345599353313446,
+            "pat_sota": 0.2677920013666153
         },
         "correctness": {},
         "status": "success",
@@ -814,8 +814,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_baseline": 0.32307200133800507,
-            "pat_sota": 0.2816320061683655
+            "pat_baseline": 0.3267200142145157,
+            "pat_sota": 0.28567999601364136
         },
         "correctness": {},
         "status": "success",
@@ -828,8 +828,8 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_baseline": 0.871936023235321,
-            "pat_sota": 0.8643200099468231
+            "pat_baseline": 0.8724480271339417,
+            "pat_sota": 0.8631680011749268
         },
         "correctness": {},
         "status": "success",
@@ -842,8 +842,36 @@
         "head_dim": 128,
         "block_size": 32,
         "latencies": {
-            "pat_baseline": 0.2937279939651489,
-            "pat_sota": 0.25433599948883057
+            "pat_baseline": 0.2938559949398041,
+            "pat_sota": 0.2513920068740845
+        },
+        "correctness": {},
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "rl_case_0003_pid_1954796",
+        "nheads_q": 32,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "pat_baseline": 0.30804799497127533,
+            "pat_sota": 0.2754399925470352
+        },
+        "correctness": {},
+        "status": "success",
+        "error": null
+    },
+    {
+        "tree": "rl_case_0003_pid_1954796",
+        "nheads_q": 64,
+        "nheads_kv": 8,
+        "head_dim": 128,
+        "block_size": 32,
+        "latencies": {
+            "pat_baseline": 0.32254400849342346,
+            "pat_sota": 0.2821120023727417
         },
         "correctness": {},
         "status": "success",
