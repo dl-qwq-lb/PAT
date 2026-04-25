@@ -793,7 +793,9 @@ public:
             : std::max(1, batch_min_kv);
         const int global_L_kv_aligned = _bp_align_up_multiple(global_L_kv, block_size);
 
-        const int min_kv_tokens_budget = std::max(min_blocks_per_piece * block_size, global_L_kv_aligned);
+        bool budget_strict_lkv = budget_phase;
+        const int min_kv_tokens_budget_strict = std::max(min_blocks_per_piece * block_size, global_L_kv_aligned);
+        const int min_kv_tokens_budget_relaxed = min_blocks_per_piece * block_size;
         const int min_kv_tokens_nonbudget = std::max(min_blocks_per_piece * block_size, batch_min_kv);
 
         const int HR = std::max(1, HRatio);
@@ -834,6 +836,9 @@ public:
         int total_cta = (int)crop.size();
         int applied_actions = 0;
         const int max_actions = 64;
+        bool plateau_unlock_used = false;
+        bool plateau_round_active = false;
+        int plateau_target_kv = -1;
 
         while (applied_actions < max_actions) {
             double sum_cost_it = 0.0;
@@ -850,8 +855,13 @@ public:
             int best_k = 1;
             int best_added_cta = 0;
             double best_gain = budget_phase ? -1e100 : 0.0;
+            int plateau_i = -1;
+            int plateau_kv = -1;
+            const bool budget_relaxed = (budget_phase && !budget_strict_lkv);
 
-            const int min_kv_tokens_per_piece = budget_phase ? min_kv_tokens_budget : min_kv_tokens_nonbudget;
+            const int min_kv_tokens_per_piece = budget_phase
+                ? (budget_strict_lkv ? min_kv_tokens_budget_strict : min_kv_tokens_budget_relaxed)
+                : min_kv_tokens_nonbudget;
 
             for (size_t i = 0; i < crop.size(); ++i) {
                 const auto& b = crop[i];
@@ -895,6 +905,7 @@ public:
 
                 auto try_k = [&](int k) {
                     if (k > max_k) return;
+                    if (budget_relaxed && k != 2) return;
                     if (!can_split_k(k)) return;
 
                     const int added_cta = k - 1;
@@ -919,6 +930,28 @@ public:
                     if (!budget_phase) {
                         if (gain > best_gain) {
                             best_gain = gain;
+                            best_i = (int)i;
+                            best_k = k;
+                            best_added_cta = added_cta;
+                        }
+                        const bool plateau_enter_candidate = (!plateau_round_active && !plateau_unlock_used &&
+                                                              max_cost_count_it > 1 && k == 2 &&
+                                                              is_bottleneck_cta && waves_after == waves_before &&
+                                                              std::abs(gain) <= 1e-9);
+                        const bool plateau_round_candidate = (plateau_round_active && k == 2 && is_bottleneck_cta &&
+                                                              waves_after == waves_before && kv == plateau_target_kv);
+                        const bool plateau_candidate = plateau_enter_candidate || plateau_round_candidate;
+                        if (plateau_candidate && kv > plateau_kv) {
+                            plateau_kv = kv;
+                            plateau_i = (int)i;
+                        }
+                    } else if (budget_relaxed) {
+                        // 放开 L_kv 后沿用原候选框架，但只做全局最长 chunk 的贪心二分。
+                        const double score = (double)kv;
+                        const bool better_score = (score > best_gain);
+                        const bool tie_more_fill = (score == best_gain && added_cta > best_added_cta);
+                        if (better_score || tie_more_fill) {
+                            best_gain = score;
                             best_i = (int)i;
                             best_k = k;
                             best_added_cta = added_cta;
@@ -949,16 +982,40 @@ public:
             }
 
             if (!budget_phase) {
-                if (best_i < 0 || best_k <= 1 || best_gain <= 0.0) break;
+                if (plateau_round_active) {
+                    if (plateau_i >= 0) {
+                        best_i = plateau_i;
+                        best_k = 2;
+                        best_added_cta = 1;
+                    } else {
+                        break;
+                    }
+                } else if (best_i < 0 || best_k <= 1 || best_gain <= 0.0) {
+                    if (plateau_i >= 0) {
+                        best_i = plateau_i;
+                        best_k = 2;
+                        best_added_cta = 1;
+                        plateau_unlock_used = true;
+                        plateau_round_active = true;
+                        plateau_target_kv = plateau_kv;
+                    } else {
+                        break;
+                    }
+                }
             } else {
-                if (best_i < 0 || best_k <= 1) break;
+                if (best_i < 0 || best_k <= 1) {
+                    if (budget_strict_lkv && total_cta < cta_limit) {
+                        budget_strict_lkv = false;
+                        continue;
+                    }
+                    break;
+                }
             }
 
             PackedBox to_split = std::move(crop[best_i]);
             std::vector<PackedBox> pieces;
             pieces.reserve(best_k);
-            const int min_kv_tokens_apply = budget_phase ? min_kv_tokens_budget : min_kv_tokens_nonbudget;
-            _bp_split_box_even_blocks(std::move(to_split), best_k, pieces, min_kv_tokens_apply);
+            _bp_split_box_even_blocks(std::move(to_split), best_k, pieces, min_kv_tokens_per_piece);
             if (pieces.size() < 2) {
                 crop[best_i] = std::move(pieces.empty() ? to_split : pieces[0]);
                 break;
@@ -973,6 +1030,7 @@ public:
 
             if (budget_phase && total_cta >= cta_limit) {
                 budget_phase = false;
+                budget_strict_lkv = false;
             }
         }
         return crop;

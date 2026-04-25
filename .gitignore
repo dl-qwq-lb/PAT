@@ -27,8 +27,6 @@ venv/
 *.tmp
 
 # Ignore Documents
-instructions/
-
 benchmark/.rl_cases/
 
 .vscode/
